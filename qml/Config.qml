@@ -50,6 +50,9 @@ Singleton {
       property var pillModules: ["battery", "volume", "workspaces", "network", "clock"]
       property string customWallpaperScript: ""
       property bool pillOnHover: false
+      // "all" puts a pill on every monitor, or a monitor name like "DP-1" for one pill
+      property string pillMonitor: "all"
+      property bool hidePillOnFullscreen: true
       property bool confirmPowerActions: true
       // suspend/restart/shutdown buttons on the lockscreen card
       property bool lockscreenPowerActions: true
@@ -110,6 +113,8 @@ Singleton {
   readonly property alias pillModules: adapter.pillModules
   readonly property alias customWallpaperScript: adapter.customWallpaperScript
   readonly property alias pillOnHover: adapter.pillOnHover
+  readonly property alias pillMonitor: adapter.pillMonitor
+  readonly property alias hidePillOnFullscreen: adapter.hidePillOnFullscreen
   readonly property alias confirmPowerActions: adapter.confirmPowerActions
   readonly property alias lockscreenPowerActions: adapter.lockscreenPowerActions
   readonly property alias lockscreenMedia: adapter.lockscreenMedia

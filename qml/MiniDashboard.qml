@@ -106,14 +106,39 @@ Item {
     }
   }
 
-  // show battery in mini dashboard too, but no plug icon on desktops
-  Battery {
-    visible: box.hasBattery
-    fontSize: 14
+  // top right: battery (laptops only, no plug icon on desktops) and the settings button
+  Row {
     anchors.top: parent.top
     anchors.right: parent.right
     anchors.topMargin: 8
     anchors.rightMargin: 12
+    spacing: 8
+
+    Battery {
+      visible: box.hasBattery
+      fontSize: 14
+      anchors.verticalCenter: parent.verticalCenter
+    }
+
+    // opens the config app
+    Rectangle {
+      width: buttonSize; height: buttonSize
+      radius: buttonctlRadius; color: buttonBg
+      Text {
+        anchors.centerIn: parent
+        text: String.fromCodePoint(0xf0493) // nf-md-cog
+        color: settingsHover.containsMouse ? buttonHoverBg : Theme.fg
+        font { family: Config.nerdFontFamily; pixelSize: 11 }
+        Behavior on color { ColorAnimation { duration: buttonHoverSpeed } }
+      }
+      MouseArea {
+        id: settingsHover
+        anchors.fill: parent
+        cursorShape: Qt.PointingHandCursor
+        hoverEnabled: true
+        onClicked: { box.miniDashboard = false; Quickshell.execDetached(["chillpill-config"]) }
+      }
+    }
   }
 
   // internet protocol information

@@ -107,7 +107,8 @@ ShellRoot {
   property int buttonctlRadius: 6
 
   property bool notifFullscreenMode: false
-  property bool fullscreenActive: ToplevelManager.activeToplevel && ToplevelManager.activeToplevel.fullscreen
+  // off: the pill stays over fullscreen apps, so the fullscreen-only OSDs are not needed either
+  property bool fullscreenActive: !!(Config.hidePillOnFullscreen && ToplevelManager.activeToplevel && ToplevelManager.activeToplevel.fullscreen)
 
   // osd ui
   property int osdInWidth: 120
@@ -147,7 +148,13 @@ ShellRoot {
   // one pill per monitor. Indent kept as upstream's single window to keep upstream merges clean.
   Variants {
   id: pillWindows
-  model: Quickshell.screens
+  // the chosen monitor, or the first one when it is not connected
+  model: {
+    const all = Quickshell.screens
+    if (Config.pillMonitor === "all") return all
+    const one = all.filter(s => s.name === Config.pillMonitor)
+    return one.length ? one : all.slice(0, 1)
+  }
   PanelWindow {
     id: panelWindow
     required property var modelData
