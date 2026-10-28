@@ -24,6 +24,7 @@ Page {
     ToggleRow { label: "Hide in fullscreen"; hint: "Hide the Pill Bar on a monitor while its fullscreen app is focused"; value: ConfigStore.get("hidePillOnFullscreen", true); onEdited: (v) => ConfigStore.set("hidePillOnFullscreen", v) }
     ToggleRow { label: "Show pill on hover"; hint: "Auto hide the Pill Bar"; value: ConfigStore.get("pillOnHover", false); onEdited: (v) => ConfigStore.set("pillOnHover", v) }
     ChoiceRow { label: "Network speed unit"; hint: "netSpeed module: bytes (K = KiB/s) or bits (K = kbit/s)"; options: ["bytes", "bits"]; value: ConfigStore.get("netSpeedUnit", "bytes"); onEdited: (v) => ConfigStore.set("netSpeedUnit", v) }
+    ToggleRow { label: "Network icon only"; hint: "Show only the network icon in the Pill Bar, without the network name"; value: ConfigStore.get("networkIconOnly", false); onEdited: (v) => ConfigStore.set("networkIconOnly", v) }
     TextRow { label: "Clock format"; hint: "Qt format string, e.g. hh:mm (10:00) or h:mm AP (10:15 AM)"; fieldWidth: 160; value: ConfigStore.get("clockFormat", "hh:mm"); onEdited: (v) => ConfigStore.set("clockFormat", v) }
     NumRow { label: "Max workspaces"; from: 1; to: 20; value: ConfigStore.get("maxWorkspaces", 5); onEdited: (v) => ConfigStore.set("maxWorkspaces", v) }
     Heading { text: "PRIVACY" }

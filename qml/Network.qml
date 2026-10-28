@@ -8,7 +8,7 @@ RowLayout {
 
   spacing: 4 * Config.paddingScale
 
-  property string iconFg: Theme.netFg
+  property string iconFg: Theme.fg
   property string disconIconFg: Theme.netFgOff
 
   readonly property bool wifiEnabled: Networking.wifiEnabled
@@ -49,6 +49,7 @@ RowLayout {
   }
 
   Text {
+      visible: !Config.networkIconOnly
       text: {
           if (root.tethered) return root.usbTether ? "USB" : "LAN"
           if (!Networking.wifiEnabled) return "off"

@@ -7,13 +7,13 @@ RowLayout {
   Text {
     text: "\uf0f3"
     font { family: Config.nerdFontFamily; pixelSize: 10 * box.dpi }
-    color: notificationModule.notifications.length > 0 ? Theme.notifFg : Theme.netFgOff
+    color: notificationModule.notifications.length > 0 ? Theme.fg : Theme.fg6
   }
 
   Text {
     text: notificationModule.notifications.length
     font { family: Config.textFontFamily; pixelSize: 10 * box.dpi }
-    color: Theme.fg
+    color: notificationModule.notifications.length > 0 ? Theme.fg : Theme.fg6
   }
 
 }

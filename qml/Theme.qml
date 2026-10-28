@@ -238,21 +238,21 @@ Singleton {
     property string powerRestartConfirm: themeColor("powerRestartConfirm", "#ff6c25")
     property string powerLogoutConfirm: themeColor("powerLogoutConfirm", "#e07e20")
 
-    // weather
+    // weather (icons are monochrome by default; fog stays dimmer)
     property string weatherText: themeColor("weatherText", "#ecebeb")
     property string weatherCondition: themeColor("weatherCondition", "#7e7e7e")
     property string weatherTemp: themeColor("weatherTemp", "#a0a0a0")
     property string weatherDay: themeColor("weatherDay", "#6e6e6e")
-    property string weatherFeels: themeColor("weatherFeels", "#f18d41")
-    property string weatherHumidity: themeColor("weatherHumidity", "#5f99fa")
-    property string weatherWind: themeColor("weatherWind", "#54e04b")
-    property string weatherSunrise: themeColor("weatherSunrise", "#ffcd58")
-    property string weatherSunset: themeColor("weatherSunset", "#ff904d")
-    property string weatherClear: themeColor("weatherClear", "#f4c542")
-    property string weatherCloudy: themeColor("weatherCloudy", "#9aa0a6")
-    property string weatherRain: themeColor("weatherRain", "#4a9de8")
-    property string weatherThunder: themeColor("weatherThunder", "#e8b84a")
-    property string weatherSnow: themeColor("weatherSnow", "#d8e8f4")
+    property string weatherFeels: themeColor("weatherFeels", fg)
+    property string weatherHumidity: themeColor("weatherHumidity", fg)
+    property string weatherWind: themeColor("weatherWind", fg)
+    property string weatherSunrise: themeColor("weatherSunrise", fg)
+    property string weatherSunset: themeColor("weatherSunset", fg)
+    property string weatherClear: themeColor("weatherClear", fg)
+    property string weatherCloudy: themeColor("weatherCloudy", fg)
+    property string weatherRain: themeColor("weatherRain", fg)
+    property string weatherThunder: themeColor("weatherThunder", fg)
+    property string weatherSnow: themeColor("weatherSnow", fg)
     property string weatherFog: fgMuted
 
     // widgets

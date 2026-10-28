@@ -89,10 +89,6 @@ RowLayout {
       return String.fromCodePoint(0xf057e)
   }
 
-  function toggleMute() {
-    sink.audio.muted = !sink.audio.muted
-  }
-
   // icon
   Text {
     text: root.icon

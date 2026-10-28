@@ -74,16 +74,23 @@ ShellRoot {
 
   IpcHandler {
     target: "wifiState"
-    function toggle(): void { focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.bluetoothPanelOpen = false; focusedBox.wifiPanelOpen = !focusedBox.wifiPanelOpen; focusedBox.controlCenter = focusedBox.wifiPanelOpen; focusedBox.themePicker = false }
-    function show(): void { focusedBox.controlCenter = true; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.bluetoothPanelOpen = false; focusedBox.wifiPanelOpen = true }
+    function toggle(): void { focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.bluetoothPanelOpen = false; focusedBox.audioPanelOpen = false; focusedBox.wifiPanelOpen = !focusedBox.wifiPanelOpen; focusedBox.controlCenter = focusedBox.wifiPanelOpen; focusedBox.themePicker = false }
+    function show(): void { focusedBox.controlCenter = true; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.bluetoothPanelOpen = false; focusedBox.audioPanelOpen = false; focusedBox.wifiPanelOpen = true }
     function hide(): void { focusedBox.powerMenu = false; focusedBox.wifiPanelOpen = false }
   }
 
   IpcHandler {
     target: "bluetoothState"
-    function toggle(): void { focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.wifiPanelOpen = false; focusedBox.bluetoothPanelOpen = !focusedBox.bluetoothPanelOpen; focusedBox.controlCenter = focusedBox.bluetoothPanelOpen; focusedBox.themePicker = false }
-    function show(): void { focusedBox.controlCenter = true; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.wifiPanelOpen = false; focusedBox.bluetoothPanelOpen = true }
+    function toggle(): void { focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.wifiPanelOpen = false; focusedBox.audioPanelOpen = false; focusedBox.bluetoothPanelOpen = !focusedBox.bluetoothPanelOpen; focusedBox.controlCenter = focusedBox.bluetoothPanelOpen; focusedBox.themePicker = false }
+    function show(): void { focusedBox.controlCenter = true; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.wifiPanelOpen = false; focusedBox.audioPanelOpen = false; focusedBox.bluetoothPanelOpen = true }
     function hide(): void { focusedBox.powerMenu = false; focusedBox.bluetoothPanelOpen = false }
+  }
+
+  IpcHandler {
+    target: "audioState"
+    function toggle(): void { focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.wifiPanelOpen = false; focusedBox.bluetoothPanelOpen = false; focusedBox.audioPanelOpen = !focusedBox.audioPanelOpen; focusedBox.controlCenter = focusedBox.audioPanelOpen; focusedBox.themePicker = false }
+    function show(): void { focusedBox.controlCenter = true; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.wifiPanelOpen = false; focusedBox.bluetoothPanelOpen = false; focusedBox.audioPanelOpen = true }
+    function hide(): void { focusedBox.powerMenu = false; focusedBox.audioPanelOpen = false }
   }
 
   function capitalize(str) {
@@ -167,7 +174,7 @@ ShellRoot {
       && ToplevelManager.activeToplevel.screens.some(s => s.name === screen.name)
     // overlay, so the pill shows over a fullscreen window that has lost focus
     WlrLayershell.layer: WlrLayershell.Overlay
-    WlrLayershell.keyboardFocus: (box.wifiPanelOpen || box.bluetoothPanelOpen || box.cliphistOpen || box.spotlight || box.wallpaperSwitcherOpen || box.themePicker || box.powerMenu || box.sysmon !== "" ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None)
+    WlrLayershell.keyboardFocus: (box.wifiPanelOpen || box.bluetoothPanelOpen || box.audioPanelOpen || box.cliphistOpen || box.spotlight || box.wallpaperSwitcherOpen || box.themePicker || box.powerMenu || box.sysmon !== "" ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None)
     implicitHeight: Math.max(885 * scale, calendarLoader.item && calendarLoader.item.visible
             ? calendarLoader.y + calendarLoader.item.height : 0)
     onScreenChanged: console.log("dpi:", screen.devicePixelRatio)
@@ -381,6 +388,23 @@ ShellRoot {
         interval: 520
         onTriggered: box.bluetoothPanelLoaded = false
       }
+      property bool audioPanelOpen: false
+      // the panel is a Loader (see audioPanelHost): built on first open,
+      // unloaded a while after closing, like the bluetooth panel
+      property bool audioPanelLoaded: false
+      onAudioPanelOpenChanged: {
+        if (audioPanelOpen) {
+          audioPanelLoaded = true
+          audioPanelUnloadTimer.stop()
+        } else {
+          audioPanelUnloadTimer.restart()
+        }
+      }
+      Timer {
+        id: audioPanelUnloadTimer
+        interval: bluetoothPanelUnloadTimer.interval
+        onTriggered: box.audioPanelLoaded = false
+      }
       property bool cliphistOpen: false
       property bool wallpaperSwitcherOpen: false
       property bool cliphistPreviewing: false
@@ -419,7 +443,7 @@ ShellRoot {
       }
 
       onControlCenterChanged: {
-        if (!controlCenter) { wifiPanelOpen = false; bluetoothPanelOpen = false }
+        if (!controlCenter) { wifiPanelOpen = false; bluetoothPanelOpen = false; audioPanelOpen = false }
       }
 
       onChargingChanged: {
@@ -476,6 +500,8 @@ ShellRoot {
       readonly property real wifiPanelHeight: 350
       readonly property real bluetoothPanelBoxWidth: 340
       readonly property real bluetoothPanelHeight: 350
+      readonly property real audioPanelBoxWidth: 340
+      readonly property real audioPanelHeight: 440
 
       readonly property real baseWidth: activeOsd === "battery" ? osdWidth
                      : activeOsd === "timer" ? osdWidth
@@ -483,7 +509,7 @@ ShellRoot {
                      : activeOsd === "brightness" ? osdWidth
                      : (notificationModule.active && !notifFullscreenMode) ? 320
                      : powerMenu ? 350
-                     : controlCenter ? (wifiPanelOpen ? wifiPanelBoxWidth : bluetoothPanelOpen ? bluetoothPanelBoxWidth : ccBaseWidth)
+                     : controlCenter ? (wifiPanelOpen ? wifiPanelBoxWidth : bluetoothPanelOpen ? bluetoothPanelBoxWidth : audioPanelOpen ? audioPanelBoxWidth : ccBaseWidth)
                      : spotlight ? 328
                      : miniDashboard ? 420
                      : themePicker ? 310
@@ -502,6 +528,7 @@ ShellRoot {
                   : powerMenu ? 102
                   : wifiPanelOpen ? wifiPanelHeight
                   : bluetoothPanelOpen ? bluetoothPanelHeight
+                  : audioPanelOpen ? audioPanelHeight
                   : controlCenter
                       ? Math.max((mprisModule.hasPlayer ? 240 : 118) + notifBump)
                   : (cliphistOpen && cliphistPreviewing) ? 380
@@ -520,6 +547,7 @@ ShellRoot {
         : cliphistOpen ? 28
         : wifiPanelOpen ? 25
         : bluetoothPanelOpen ? 25
+        : audioPanelOpen ? 25
         : controlCenter ? (notificationModule.notifications.length > 0
           ? (mprisModule.hasPlayer ? 27 : 25)
           : (mprisModule.hasPlayer ? 26 : 22))
@@ -543,7 +571,7 @@ ShellRoot {
           NumberAnimation { duration: 225; easing.type: Easing.OutExpo }
       }
 
-      color: wifiPanelOpen || bluetoothPanelOpen ? Theme.bgD : bg
+      color: wifiPanelOpen || bluetoothPanelOpen || audioPanelOpen ? Theme.bgD : bg
 
       onCalendarShownChanged: if (calendarLoader.item) calendarLoader.item.shown = box.calendarShown
 
@@ -920,7 +948,7 @@ ShellRoot {
       Item {
         anchors.centerIn: parent
         width: box.implicitWidth - 24
-        opacity: box.controlCenter && box.activeOsd === "" && !notificationModule.active && !box.powerMenu && !box.wifiPanelOpen && !box.bluetoothPanelOpen ? 1 : 0
+        opacity: box.controlCenter && box.activeOsd === "" && !notificationModule.active && !box.powerMenu && !box.wifiPanelOpen && !box.bluetoothPanelOpen && !box.audioPanelOpen ? 1 : 0
         visible: opacity > 0
         height: box.controlCenter && box.activeOsd === "" ? box.implicitHeight - 25 : 0
 
@@ -998,6 +1026,36 @@ ShellRoot {
               anchors.fill: parent
               shown: box.bluetoothPanelOpen
               onCloseRequested: box.bluetoothPanelOpen = false
+            }
+          }
+        }
+      }
+
+      // audio panel, takes over the cc content inside the box
+      Item {
+        id: audioPanelHost
+        anchors.centerIn: parent
+        width: Math.max(0, box.width - 35)
+        height: box.audioPanelOpen ? Math.max(0, box.height - 25) : 0
+        opacity: box.audioPanelOpen
+                 && !notificationModule.active
+                 && box.activeOsd === "" ? 1 : 0
+        // not "opacity > 0": the panel needs focus for the escape handler
+        visible: box.audioPanelOpen
+        clip: true
+
+        Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.OutExpo } }
+
+        Loader {
+          anchors.fill: parent
+          active: box.audioPanelLoaded
+          asynchronous: true
+
+          sourceComponent: Component {
+            AudioPanel {
+              anchors.fill: parent
+              shown: box.audioPanelOpen
+              onCloseRequested: box.audioPanelOpen = false
             }
           }
         }
@@ -1287,6 +1345,7 @@ ShellRoot {
             notifFullscreenMode = fullscreenActive
             focusedBox.wifiPanelOpen = false
             focusedBox.bluetoothPanelOpen = false
+            focusedBox.audioPanelOpen = false
         } else {
             notifFullscreenMode = false
         }

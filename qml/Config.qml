@@ -55,6 +55,8 @@ Singleton {
       // "all" puts a pill on every monitor, or a monitor name like "DP-1" for one pill
       property string pillMonitor: "all"
       property bool hidePillOnFullscreen: true
+      // network pill shows only its icon, no network name
+      property bool networkIconOnly: false
       property bool confirmPowerActions: true
       // suspend/restart/shutdown buttons on the lockscreen card
       property bool lockscreenPowerActions: true
@@ -118,6 +120,7 @@ Singleton {
   readonly property alias netSpeedUnit: adapter.netSpeedUnit
   readonly property alias pillMonitor: adapter.pillMonitor
   readonly property alias hidePillOnFullscreen: adapter.hidePillOnFullscreen
+  readonly property alias networkIconOnly: adapter.networkIconOnly
   readonly property alias confirmPowerActions: adapter.confirmPowerActions
   readonly property alias lockscreenPowerActions: adapter.lockscreenPowerActions
   readonly property alias lockscreenMedia: adapter.lockscreenMedia

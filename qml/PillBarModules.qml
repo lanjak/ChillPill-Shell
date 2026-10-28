@@ -93,13 +93,16 @@ Row {
       }
       TapHandler {
         acceptedButtons: Qt.LeftButton
+        // grab the press so the box behind does not also toggle the control center
+        gesturePolicy: TapHandler.ReleaseWithinBounds
         enabled: !isCustom && (modelData === "volume" || modelData === "network" || modelData === "bluetooth")
         onTapped: {
           if (isCustom) return
           switch (modelData) {
             case "volume":
-              if (moduleLoader.item && moduleLoader.item.toggleMute)
-                moduleLoader.item.toggleMute()
+              // the audio panel lives inside the control center box
+              box.audioPanelOpen = true
+              box.controlCenter = true
               break
             case "network":
               if (moduleLoader.item && moduleLoader.item.toggleWifi)
