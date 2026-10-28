@@ -500,8 +500,6 @@ ShellRoot {
       readonly property real wifiPanelHeight: 350
       readonly property real bluetoothPanelBoxWidth: 340
       readonly property real bluetoothPanelHeight: 350
-      readonly property real audioPanelBoxWidth: 340
-      readonly property real audioPanelHeight: 440
 
       readonly property real baseWidth: activeOsd === "battery" ? osdWidth
                      : activeOsd === "timer" ? osdWidth
@@ -509,7 +507,7 @@ ShellRoot {
                      : activeOsd === "brightness" ? osdWidth
                      : (notificationModule.active && !notifFullscreenMode) ? 320
                      : powerMenu ? 350
-                     : controlCenter ? (wifiPanelOpen ? wifiPanelBoxWidth : bluetoothPanelOpen ? bluetoothPanelBoxWidth : audioPanelOpen ? audioPanelBoxWidth : ccBaseWidth)
+                     : controlCenter ? (wifiPanelOpen ? wifiPanelBoxWidth : bluetoothPanelOpen ? bluetoothPanelBoxWidth : ccBaseWidth)
                      : spotlight ? 328
                      : miniDashboard ? 420
                      : themePicker ? 310
@@ -528,9 +526,10 @@ ShellRoot {
                   : powerMenu ? 102
                   : wifiPanelOpen ? wifiPanelHeight
                   : bluetoothPanelOpen ? bluetoothPanelHeight
-                  : audioPanelOpen ? audioPanelHeight
                   : controlCenter
-                      ? Math.max((mprisModule.hasPlayer ? 240 : 118) + notifBump)
+                      // the audio panel keeps the cc height, growing only if its rows need more
+                      ? Math.max((mprisModule.hasPlayer ? 240 : 118) + notifBump,
+                                 audioPanelOpen && audioPanelLoader.item ? audioPanelLoader.item.contentHeight + 25 : 0)
                   : (cliphistOpen && cliphistPreviewing) ? 380
                   : themePicker ? 320
                   : miniDashboard ? 155
@@ -547,7 +546,6 @@ ShellRoot {
         : cliphistOpen ? 28
         : wifiPanelOpen ? 25
         : bluetoothPanelOpen ? 25
-        : audioPanelOpen ? 25
         : controlCenter ? (notificationModule.notifications.length > 0
           ? (mprisModule.hasPlayer ? 27 : 25)
           : (mprisModule.hasPlayer ? 26 : 22))
@@ -571,7 +569,7 @@ ShellRoot {
           NumberAnimation { duration: 225; easing.type: Easing.OutExpo }
       }
 
-      color: wifiPanelOpen || bluetoothPanelOpen || audioPanelOpen ? Theme.bgD : bg
+      color: wifiPanelOpen || bluetoothPanelOpen ? Theme.bgD : bg
 
       onCalendarShownChanged: if (calendarLoader.item) calendarLoader.item.shown = box.calendarShown
 
@@ -1031,12 +1029,12 @@ ShellRoot {
         }
       }
 
-      // audio panel, takes over the cc content inside the box
+      // audio panel, takes the place of the cc content, same box and frame
       Item {
         id: audioPanelHost
         anchors.centerIn: parent
-        width: Math.max(0, box.width - 35)
-        height: box.audioPanelOpen ? Math.max(0, box.height - 25) : 0
+        width: box.implicitWidth - 24
+        height: box.audioPanelOpen ? box.implicitHeight - 25 : 0
         opacity: box.audioPanelOpen
                  && !notificationModule.active
                  && box.activeOsd === "" ? 1 : 0
@@ -1047,6 +1045,7 @@ ShellRoot {
         Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.OutExpo } }
 
         Loader {
+          id: audioPanelLoader
           anchors.fill: parent
           active: box.audioPanelLoaded
           asynchronous: true
@@ -1055,7 +1054,7 @@ ShellRoot {
             AudioPanel {
               anchors.fill: parent
               shown: box.audioPanelOpen
-              onCloseRequested: box.audioPanelOpen = false
+              onCloseRequested: box.controlCenter = false
             }
           }
         }

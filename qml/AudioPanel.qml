@@ -4,8 +4,8 @@ import Quickshell.Services.Pipewire
 import QtQuick
 import QtQuick.Layouts
 
-// Audio panel, shown inside the cc box (see shell.qml)
-// Same structure as BluetoothPanel: Item + shown + closeRequested, host owns open state
+// Audio devices, shown in place of the cc content (see shell.qml)
+// Clicks on empty space fall through to the box, which closes the cc
 Item {
   id: audioPanel
 
@@ -15,14 +15,15 @@ Item {
   // Keys needs active focus
   focus: shown
 
+  // height the box needs to show every row
+  readonly property real contentHeight: sections.implicitHeight
+
   readonly property var nodes: Pipewire.nodes.values
   readonly property var sinks: nodes.filter(n => n.type === PwNodeType.AudioSink)
   readonly property var sources: nodes.filter(n => n.type === PwNodeType.AudioSource)
-  // playback streams of applications
-  readonly property var streams: nodes.filter(n => n.type === PwNodeType.AudioOutStream)
 
-  // volume/mute of a node is only live while it is bound
-  PwObjectTracker { objects: audioPanel.shown ? audioPanel.sinks.concat(audioPanel.sources, audioPanel.streams) : [] }
+  // mute state of a node is only live while it is bound
+  PwObjectTracker { objects: audioPanel.shown ? audioPanel.sinks.concat(audioPanel.sources) : [] }
 
   // sound cards from pactl: a sink or source is disabled by switching its
   // card to a profile without that direction (pavucontrol's "Off")
@@ -43,16 +44,14 @@ Item {
     onExited: cardList.running = true
   }
 
-  function refreshCards() { cardList.running = true }
-
   onShownChanged: if (shown) openPanel()
   // a Loader can build this already-open, and then shown never "changes"
   Component.onCompleted: if (shown) openPanel()
   // a card that changes profile adds or drops nodes
-  onNodesChanged: if (shown) refreshCards()
+  onNodesChanged: if (shown) cardList.running = true
 
   function openPanel() {
-    refreshCards()
+    cardList.running = true
     // the Loader is asynchronous, so this can run before the panel is in a window
     Qt.callLater(() => audioPanel.forceActiveFocus())
   }
@@ -95,105 +94,52 @@ Item {
     })
   }
 
-  function nodeName(n) {
-    return n.nickname || n.description || n.name
-  }
-
-  function streamName(n) {
-    const p = n.properties || {}
-    return p["application.name"] || n.description || n.name
-  }
-
-  // keep clicks off the cc below
-  MouseArea { anchors.fill: parent; enabled: audioPanel.shown }
-
   Keys.onEscapePressed: closeRequested()
 
-  // header button: panel fill, hover lift (same as BluetoothPanel)
-  component HeaderButton: Rectangle {
-    id: hb
-    property string glyph: ""
+  // small glyph button inside a row
+  component RowGlyph: Text {
+    id: rg
+    property color tone: Theme.fg4
     signal clicked
 
-    implicitWidth: 25
-    implicitHeight: 25
-    radius: 15
-    color: hbMa.containsMouse ? Theme.bg3 : Theme.bgD
-    scale: hbMa.pressed ? 0.92 : (hbMa.containsMouse ? 1.03 : 1)
-
-    Text {
-      anchors.centerIn: parent
-      text: hb.glyph
-      color: hbMa.containsMouse ? Theme.fg : Theme.fg4
-      font { family: Theme.nerdFontFamily; pixelSize: 12 }
-    }
-
-    MouseArea {
-      id: hbMa
-      anchors.fill: parent
-      hoverEnabled: true
-      cursorShape: Qt.PointingHandCursor
-      onClicked: hb.clicked()
-    }
-  }
-
-  // small round icon button for mute / disable
-  component IconButton: Rectangle {
-    id: ib
-    property string glyph: ""
-    property color tone: Theme.fg3
-    property string tip: ""
-    signal clicked
-
-    implicitWidth: 24
-    implicitHeight: 24
-    radius: 12
-    color: ibMa.containsMouse ? Theme.bg4 : "transparent"
-    scale: ibMa.pressed ? 0.9 : 1
+    color: rgMa.containsMouse ? Theme.fg : tone
+    font { family: Theme.nerdFontFamily; pixelSize: 12 }
+    Layout.preferredWidth: 18
+    horizontalAlignment: Text.AlignHCenter
+    scale: rgMa.pressed ? 0.85 : 1
     Behavior on color { ColorAnimation { duration: 100 } }
-
-    Text {
-      anchors.centerIn: parent
-      text: ib.glyph
-      color: ib.tone
-      font { family: Theme.nerdFontFamily; pixelSize: 13 }
-      Behavior on color { ColorAnimation { duration: 120 } }
-    }
+    Behavior on scale { NumberAnimation { duration: 80; easing.type: Easing.OutQuad } }
 
     MouseArea {
-      id: ibMa
+      id: rgMa
       anchors.fill: parent
+      anchors.margins: -4
       hoverEnabled: true
       cursorShape: Qt.PointingHandCursor
-      onClicked: ib.clicked()
+      onClicked: rg.clicked()
     }
   }
 
-  component SectionLabel: Text {
-    color: Theme.fg4
-    topPadding: 6
-    font { family: Theme.fontFamily; pixelSize: 10; weight: 500 }
-  }
-
-  // one sink or source: click selects it as default
+  // one device; a disabled card shows with only the power glyph to turn it back on
   component DeviceRow: Rectangle {
     id: dr
-    property var node
+    property var node: null
+    property var card: node ? audioPanel.cardOf(node) : null
     property bool isSource: false
-    readonly property bool isDefault: node === (isSource ? Pipewire.defaultAudioSource : Pipewire.defaultAudioSink)
-    readonly property bool muted: node && node.ready && node.audio.muted
-    readonly property var card: audioPanel.cardOf(node)
+    readonly property bool disabled: node === null
+    readonly property bool isDefault: !disabled && node === (isSource ? Pipewire.defaultAudioSource : Pipewire.defaultAudioSink)
+    readonly property bool muted: !disabled && node.ready && node.audio.muted
 
     width: parent ? parent.width : 0
-    implicitHeight: 38
-    radius: 14
-    color: rowMa.containsMouse ? Theme.bg3 : Theme.rowBg
+    height: 24
+    radius: 8
+    color: dr.isDefault ? Theme.bg2 : (rowHover.hovered && !dr.disabled ? Theme.bg1 : "transparent")
     Behavior on color { ColorAnimation { duration: 120 } }
 
+    HoverHandler { id: rowHover }
     MouseArea {
-      id: rowMa
       anchors.fill: parent
-      hoverEnabled: true
+      enabled: !dr.disabled
       cursorShape: Qt.PointingHandCursor
       onClicked: {
         if (dr.isSource) Pipewire.preferredDefaultAudioSource = dr.node
@@ -203,238 +149,114 @@ Item {
 
     RowLayout {
       anchors.fill: parent
-      anchors.leftMargin: 12
-      anchors.rightMargin: 6
+      anchors.leftMargin: 8
+      anchors.rightMargin: 8
       spacing: 8
 
-      Text {
-        // nf-md-radiobox_marked / nf-md-radiobox_blank
-        text: String.fromCodePoint(dr.isDefault ? 0xf043e : 0xf043d)
-        color: dr.isDefault ? Theme.fg : Theme.fg5
-        font { family: Theme.nerdFontFamily; pixelSize: 13 }
-      }
-
-      Text {
-        Layout.fillWidth: true
-        text: audioPanel.nodeName(dr.node)
-        color: dr.muted ? Theme.fg4 : Theme.fg
-        elide: Text.ElideRight
-        font { family: Theme.fontFamily; pixelSize: 11; weight: dr.isDefault ? 500 : 300 }
-      }
-
-      IconButton {
+      RowGlyph {
         // nf-md-microphone(_off) / nf-md-volume_high / nf-md-volume_off
-        glyph: String.fromCodePoint(dr.isSource ? (dr.muted ? 0xf036d : 0xf036c) : (dr.muted ? 0xf0581 : 0xf057e))
-        tone: dr.muted ? Theme.mutedFgSlider : Theme.fg3
+        text: String.fromCodePoint(dr.isSource ? (dr.muted ? 0xf036d : 0xf036c) : (dr.muted ? 0xf0581 : 0xf057e))
+        tone: dr.disabled ? Theme.fg7 : dr.muted ? Theme.mutedFgSlider : dr.isDefault ? Theme.fg : Theme.fg4
+        enabled: !dr.disabled
         onClicked: if (dr.node.ready) dr.node.audio.muted = !dr.node.audio.muted
       }
 
-      IconButton {
-        visible: dr.card !== null
-        glyph: "" // nf-fa-power_off
-        tone: Theme.fg4
-        onClicked: audioPanel.setCardDirection(dr.card, dr.isSource ? "sources" : "sinks", false)
-      }
-    }
-  }
-
-  // a card with this direction turned off: power button turns it back on
-  component DisabledRow: Rectangle {
-    id: xr
-    property var card
-    property string kind: "sinks"
-
-    width: parent ? parent.width : 0
-    implicitHeight: 38
-    radius: 14
-    color: Theme.rowBg
-
-    RowLayout {
-      anchors.fill: parent
-      anchors.leftMargin: 12
-      anchors.rightMargin: 6
-      spacing: 8
-
-      Text {
-        text: String.fromCodePoint(0xf043d)
-        color: Theme.fg7
-        font { family: Theme.nerdFontFamily; pixelSize: 13 }
-      }
-
       Text {
         Layout.fillWidth: true
-        text: (xr.card.properties["device.description"] || xr.card.name) + "  · disabled"
-        color: Theme.fg5
+        text: dr.disabled ? (dr.card.properties["device.description"] || dr.card.name)
+                          : (dr.node.nickname || dr.node.description || dr.node.name)
+        color: dr.disabled ? Theme.fg6 : dr.isDefault ? Theme.fg : Theme.fg3
         elide: Text.ElideRight
-        font { family: Theme.fontFamily; pixelSize: 11; weight: 300 }
+        font { family: Theme.fontFamily; pixelSize: 10; weight: dr.isDefault ? 500 : 400 }
       }
 
-      IconButton {
-        glyph: "" // nf-fa-power_off
-        tone: Theme.fg7
-        onClicked: audioPanel.setCardDirection(xr.card, xr.kind, true)
+      RowGlyph {
+        visible: dr.card !== null
+        text: "" // nf-fa-power_off
+        tone: dr.disabled ? Theme.fg7 : Theme.fg5
+        onClicked: audioPanel.setCardDirection(dr.card, dr.isSource ? "sources" : "sinks", dr.disabled)
       }
     }
   }
 
-  // thin bar slider like the cc volume slider, value 0-1
-  component VolumeSlider: Item {
-    id: vs
-    property real value: 0
-    signal moved(real value)
+  // header tab + body, same shape as the cc notification stack
+  component Section: Item {
+    id: sec
+    property string title: ""
+    default property alias rows: body.data
 
-    implicitHeight: 4
+    width: parent ? parent.width : 0
+    implicitHeight: 20 + body.implicitHeight + 10
 
     Rectangle {
-      anchors.fill: parent
-      radius: 4
-      color: Theme.bg5
-
-      Rectangle {
-        width: parent.width * Math.min(vs.value, 1)
-        height: parent.height
-        radius: 4
-        color: Theme.sliderBg
-      }
-    }
-
-    MouseArea {
-      anchors.fill: parent
-      anchors.topMargin: -8
-      anchors.bottomMargin: -8
-      cursorShape: Qt.PointingHandCursor
-      // horizontal drags must not scroll the list
-      preventStealing: true
-      onPressed: (mouse) => vs.moved(Math.max(0, Math.min(1, mouse.x / width)))
-      onPositionChanged: (mouse) => { if (pressed) vs.moved(Math.max(0, Math.min(1, mouse.x / width))) }
-    }
-  }
-
-  // one application stream: name, mute, volume slider
-  component StreamRow: Rectangle {
-    id: sr
-    property var node
-    readonly property bool ready: node && node.ready
-    readonly property bool muted: ready && node.audio.muted
-    readonly property real volume: ready ? node.audio.volume : 0
-
-    width: parent ? parent.width : 0
-    implicitHeight: 52
-    radius: 14
-    color: Theme.rowBg
-
-    ColumnLayout {
-      anchors.fill: parent
-      anchors.leftMargin: 12
-      anchors.rightMargin: 6
-      anchors.topMargin: 5
-      anchors.bottomMargin: 10
-      spacing: 4
-
-      RowLayout {
-        Layout.fillWidth: true
-        spacing: 8
-
-        Text {
-          Layout.fillWidth: true
-          text: audioPanel.streamName(sr.node)
-          color: sr.muted ? Theme.fg4 : Theme.fg
-          elide: Text.ElideRight
-          font { family: Theme.fontFamily; pixelSize: 11 }
-        }
-
-        Text {
-          text: sr.muted ? "muted" : Math.round(sr.volume * 100) + "%"
-          color: Theme.fg3
-          font { family: Theme.fontFamily; pixelSize: 10 }
-        }
-
-        IconButton {
-          glyph: String.fromCodePoint(sr.muted ? 0xf0581 : 0xf057e)
-          tone: sr.muted ? Theme.mutedFgSlider : Theme.fg3
-          onClicked: if (sr.ready) sr.node.audio.muted = !sr.node.audio.muted
-        }
-      }
-
-      VolumeSlider {
-        Layout.fillWidth: true
-        Layout.rightMargin: 8
-        value: sr.volume
-        opacity: sr.muted ? 0.5 : 1
-        onMoved: (v) => { if (sr.ready) sr.node.audio.volume = v }
-      }
-    }
-  }
-
-  ColumnLayout {
-    anchors.fill: parent
-    spacing: 8
-    opacity: audioPanel.shown ? 1 : 0
-    Behavior on opacity { NumberAnimation { duration: 200; easing.type: Easing.OutExpo } }
-
-    // header
-    RowLayout {
-      Layout.fillWidth: true
-      spacing: 10
-
-      HeaderButton {
-        glyph: "" // nf-fa-chevron_left
-        onClicked: audioPanel.closeRequested()
-      }
+      id: tab
+      anchors.horizontalCenter: parent.horizontalCenter
+      width: parent.width - 10
+      height: 20
+      topLeftRadius: 13
+      topRightRadius: 13
+      color: Theme.notifHeaderBg
 
       Text {
-        text: "Audio"
-        color: Theme.fg
-        font { family: Theme.fontFamily; pixelSize: 16 }
+        text: sec.title
+        color: Theme.fg2
+        font { family: Theme.fontFamily; pixelSize: 9; weight: 400 }
+        anchors.left: parent.left
+        anchors.leftMargin: 16
+        anchors.verticalCenter: parent.verticalCenter
       }
-
-      Item { Layout.fillWidth: true }
     }
 
-    Flickable {
-      Layout.fillWidth: true
-      Layout.fillHeight: true
-      contentHeight: sections.implicitHeight
-      clip: true
-      boundsBehavior: Flickable.StopAtBounds
+    Rectangle {
+      anchors.top: tab.bottom
+      anchors.horizontalCenter: parent.horizontalCenter
+      width: parent.width - 10
+      height: body.implicitHeight + 10
+      bottomLeftRadius: 13
+      bottomRightRadius: 13
+      color: Theme.bgD
+      border.width: 1
+      border.color: Theme.bg3
 
       Column {
-        id: sections
-        width: parent.width
-        spacing: 5
+        id: body
+        anchors.fill: parent
+        anchors.margins: 5
+        spacing: 2
+      }
+    }
+  }
 
-        SectionLabel { text: "Output" }
-        Repeater {
-          model: audioPanel.sinks
-          delegate: DeviceRow { required property var modelData; node: modelData }
-        }
-        Repeater {
-          model: audioPanel.disabledCards("sinks")
-          delegate: DisabledRow { required property var modelData; card: modelData; kind: "sinks" }
-        }
+  Column {
+    id: sections
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    spacing: 28
+    opacity: audioPanel.shown ? 1 : 0
+    Behavior on opacity { NumberAnimation { duration: 150; easing.type: Easing.OutExpo } }
 
-        SectionLabel { text: "Input" }
-        Repeater {
-          model: audioPanel.sources
-          delegate: DeviceRow { required property var modelData; node: modelData; isSource: true }
-        }
-        Repeater {
-          model: audioPanel.disabledCards("sources")
-          delegate: DisabledRow { required property var modelData; card: modelData; kind: "sources" }
-        }
+    Section {
+      title: "Output"
+      Repeater {
+        model: audioPanel.sinks
+        delegate: DeviceRow { required property var modelData; node: modelData }
+      }
+      Repeater {
+        model: audioPanel.disabledCards("sinks")
+        delegate: DeviceRow { required property var modelData; card: modelData }
+      }
+    }
 
-        SectionLabel { text: "Applications" }
-        Text {
-          visible: audioPanel.streams.length === 0
-          text: "nothing is playing"
-          color: Theme.fg5
-          leftPadding: 12
-          font { family: Theme.fontFamily; pixelSize: 10 }
-        }
-        Repeater {
-          model: audioPanel.streams
-          delegate: StreamRow { required property var modelData; node: modelData }
-        }
+    Section {
+      title: "Input"
+      Repeater {
+        model: audioPanel.sources
+        delegate: DeviceRow { required property var modelData; node: modelData; isSource: true }
+      }
+      Repeater {
+        model: audioPanel.disabledCards("sources")
+        delegate: DeviceRow { required property var modelData; card: modelData; isSource: true }
       }
     }
   }

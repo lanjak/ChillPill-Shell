@@ -118,7 +118,7 @@ into your session at all times. It's not bound to any dotfiles.
 
 - DPI and Pill scaling is available in the config if you need it.
 
-- Audio, workspaces, bluetooth and wifi in pill bar are clickable. Clicking the volume module opens an audio panel: pick the default output and input, mute or disable each device, and set the volume of each app.
+- Audio, workspaces, bluetooth and wifi in pill bar are clickable. Clicking the volume module shows the output and input devices in the control center: pick the default device, mute it, or disable it.
 
 - Control center's media player progress bar is not only for status, it's usable to control the media you are playing.
   Timer minutes can be changed by right click, and you can hold-to-burst (stop) to halt the running timer.
