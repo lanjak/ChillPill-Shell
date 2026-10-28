@@ -2,12 +2,21 @@
 
 <div align="center">
 
-[![ChillPill-Shell 0.14.0](https://img.shields.io/badge/CP--Shell-0.14.0-blue.svg)](https://github.com/LUCKYS1NGHH/ChillPill-Shell)
+[![Release](https://img.shields.io/github/v/release/LUCKYS1NGHH/ChillPill-Shell?label=Version&color=blue)](https://github.com/LUCKYS1NGHH/ChillPill-Shell/releases)
 [![GitHub Stars](https://img.shields.io/github/stars/LUCKYS1NGHH/ChillPill-Shell?style=social)](https://github.com/LUCKYS1NGHH/ChillPill-Shell/stargazers)
 [![Quickshell 0.3.0+](https://img.shields.io/badge/Quickshell-0.3.0+-green.svg)](https://github.com/quickshell-mirror/quickshell)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-ChillPill-Shell is a **lightweight**, feature-rich dynamic pill bar for Hyprland, built with **Quickshell**.
+</div>
+
+<p align="center">
+  <a href="https://trendshift.io/repositories/81167?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-81167" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/81167/daily?language=QML" alt="LUCKYS1NGHH%2FChillPill-Shell | Trendshift" width="250" height="55"/></a>
+  <a href="https://trendshift.io/repositories/81167?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-81167" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/81167/weekly?language=QML" alt="LUCKYS1NGHH%2FChillPill-Shell | Trendshift" width="250" height="55"/></a>
+</p>
+
+<div align="center">
+
+ChillPill-Shell is a **lightweight**, **feature-rich** dynamic pill bar for Hyprland, built with **Quickshell**.
 It's aimed squarely at users running without a dedicated GPU (like me) — eye candy that doesn't cost you a discrete card. Runs great on integrated graphics.
 
 It runs as a **standalone app**: launch it from your terminal or app launcher when you want it, rather than having it baked
@@ -17,16 +26,16 @@ into your session at all times. It's not bound to any dotfiles.
 
 <div align="center">
 
-[![Resource Usage](https://img.shields.io/badge/Resource%20Usage-252525?style=flat-square)](#resource-usage)
-[![Showcase](https://img.shields.io/badge/Showcase-252525?style=flat-square)](#showcase)
-[![Features](https://img.shields.io/badge/Features-252525?style=flat-square)](#features-pill-states)
-[![Configuration](https://img.shields.io/badge/Configuration%20App-252525?style=flat-square)](#configuration-app)
-[![Extras](https://img.shields.io/badge/Extras-252525?style=flat-square)](#lockscreen-optional)
-[![Dependencies](https://img.shields.io/badge/Dependencies-252525?style=flat-square)](#dependencies)
-[![Installation](https://img.shields.io/badge/Installation-252525?style=flat-square)](#install)
-[![Auto Startup](https://img.shields.io/badge/Auto%20Startup-252525?style=flat-square)](#auto-startup)
-[![Key Bindings](https://img.shields.io/badge/Key%20Bindings-252525?style=flat-square)](#key-bindings)
-[![Acknowledgements](https://img.shields.io/badge/Acknowledgements-252525?style=flat-square)](#co-cookers)
+[![Resource Usage](https://img.shields.io/badge/Resource%20Usage-404040?style=flat-square)](#resource-usage)
+[![Showcase](https://img.shields.io/badge/Showcase-424242?style=flat-square)](#showcase)
+[![Features](https://img.shields.io/badge/Features-404040?style=flat-square)](#features-pill-states)
+[![Configuration](https://img.shields.io/badge/Configuration%20App-424242?style=flat-square)](#configuration-app)
+[![Extras](https://img.shields.io/badge/Extras-404040?style=flat-square)](#lockscreen-optional)
+[![Dependencies](https://img.shields.io/badge/Dependencies-424242?style=flat-square)](#dependencies)
+[![Installation](https://img.shields.io/badge/Installation-404040?style=flat-square)](#install)
+[![Auto Startup](https://img.shields.io/badge/Auto%20Startup-424242?style=flat-square)](#auto-startup)
+[![Key Bindings](https://img.shields.io/badge/Key%20Bindings-404040?style=flat-square)](#key-bindings)
+[![Acknowledgements](https://img.shields.io/badge/Acknowledgements-424242?style=flat-square)](#co-cookers)
 
 </div>
 
