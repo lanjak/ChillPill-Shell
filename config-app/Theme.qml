@@ -85,8 +85,11 @@ Singleton {
     // pill bar preview
     readonly property string pillBg: "#090909"
     readonly property string batteryFg: "#4bd25c"
+    readonly property string netFg: "#6791dc"
     readonly property string btFg: "#6591e0"
     readonly property string vpnFg: "#48cc47"
+    readonly property string notifFg: "#e2b052"
+    readonly property string weatherFg: "#d8ad5c"
 
     // keycaps
     readonly property string keycapFg: "#555753"

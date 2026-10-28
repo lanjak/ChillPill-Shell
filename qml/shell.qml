@@ -431,7 +431,7 @@ ShellRoot {
       property var battery: UPower.displayDevice
       property bool hasBattery: battery.isLaptopBattery && battery.isPresent
       property bool charging: hasBattery && battery.state === UPowerDeviceState.Charging
-      readonly property string batteryIconColor: box.charging || box.batteryLevel > 30 ? Theme.ok : box.batteryLevel <= 15 ? Theme.danger : Theme.warnMed
+      readonly property string batteryIconColor: box.charging || box.batteryLevel > 30 ? Theme.batteryOkFg : box.batteryLevel <= 15 ? Theme.danger : Theme.warnMed
       readonly property int batteryLevel: hasBattery ? Math.round(battery.percentage * 100) : 0
       // battery icon on laptops, plug icon on desktops
       readonly property string batteryIcon: {

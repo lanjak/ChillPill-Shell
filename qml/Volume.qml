@@ -93,23 +93,18 @@ RowLayout {
   Text {
     text: root.icon
 
-    color: {
-      if (root.muted || vol === 0) {
-        console.log("audio volume status:", root.muted)
-        return root.mutedColor
-      }
-      return root.fg
-    }
+    color: root.muted || vol === 0 ? root.mutedColor : root.fg
 
     font.family: Theme.nerdFontFamily
     font.pixelSize: 10 * Config.pillScale
-  }
 
-  MouseArea {
-    id: audioMuted
-    cursorShape: Qt.PointingHandCursor
-    onClicked: sink.audio.muted = !sink.audio.muted
-    hoverEnabled: true
+    // the speaker mutes; the rest of the module opens the audio panel (PillBarModules)
+    MouseArea {
+      anchors.fill: parent
+      anchors.margins: -3
+      cursorShape: Qt.PointingHandCursor
+      onClicked: if (root.ready) root.sink.audio.muted = !root.sink.audio.muted
+    }
   }
 
   // percentage

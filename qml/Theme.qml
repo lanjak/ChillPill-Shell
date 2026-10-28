@@ -124,6 +124,10 @@ Singleton {
         return v === undefined || v === null || v === "" ? def : v
     }
 
+    // monochromeIcons: decorative icon colours fall back to the text colour;
+    // state colours (muted, low battery, danger) stay
+    function icon(c) { return Config.monochromeIcons ? fg : c }
+
     readonly property bool isLight: !!themePreset && themePreset.variant === "light"
     function chipHover(c) {
         const col = Qt.color(c)
@@ -205,7 +209,7 @@ Singleton {
     property string fgMuted: themeColor("fgMuted", "#8a8a8a")
 
     // connectivity
-    property string netFg: themeColor("netFg", "#6791dc") // network / bluetooth pill icon
+    property string netFg: icon(themeColor("netFg", "#6791dc")) // network / bluetooth pill icon
     property string netFgOff: themeColor("netFgOff", "#9ea9bd") // disconnected icon
     property string netConnected: themeColor("netConnected", "#4175c5")
     property string netConnectedFg: themeColor("netConnectedFg", "#c9d7ef")
@@ -213,51 +217,53 @@ Singleton {
     property string netBtn: themeColor("netBtn", "#3874d7")
     property string netBtnHover: themeColor("netBtnHover", "#3065be")
     property string btDeviceOff: themeColor("btDeviceOff", "#949494")
-    property string vpnFg: themeColor("vpnFg", "#48cc47") // vpn pill icon
-    property string vpnOkFg: themeColor("vpnOkFg", "#64d667") // ip status vpn glyph
-    property string ipFg: themeColor("ipFg", "#6496dd") // ip status glyph
+    property string vpnFg: icon(themeColor("vpnFg", "#48cc47")) // vpn pill icon
+    property string vpnOkFg: icon(themeColor("vpnOkFg", "#64d667")) // ip status vpn glyph
+    property string ipFg: icon(themeColor("ipFg", "#6496dd")) // ip status glyph
 
     // control center
     property string ccActiveBg: themeColor("ccActiveBg", "#181d23") // wifi / bluetooth button active
     property string ccActiveBg2: themeColor("ccActiveBg2", "#20232a") // timer button active
     property string ccDndBg: themeColor("ccDndBg", "#262626")
-    property string ccActiveFg: themeColor("ccActiveFg", "#4888ef")
+    property string ccActiveFg: icon(themeColor("ccActiveFg", "#4888ef"))
     property string ccDndFg: themeColor("ccDndFg", "#fff9eb")
-    property string timerFg: themeColor("timerFg", "#5892f3") // timer osd icon
+    property string timerFg: icon(themeColor("timerFg", "#5892f3")) // timer osd icon
     property string burstFg: themeColor("burstFg", "#ff922b")
-    property string timerRunningFg: themeColor("timerRunningFg", "#4490ee")
+    property string timerRunningFg: icon(themeColor("timerRunningFg", "#4490ee"))
     property var burstPalette: themeColor("burstPalette", ["#ffd43b", "#ff6b6b", "#4490ee", "#b197fc", "#f783ac", "#63e6be"])
 
     // power actions
-    property string powerLock: themeColor("powerLock", "#628ae2")
-    property string powerSleep: themeColor("powerSleep", "#9d6fff")
-    property string powerLogout: themeColor("powerLogout", "#f4a232")
-    property string powerRestart: themeColor("powerRestart", "#ff6b35")
-    property string powerShutdown: themeColor("powerShutdown", "#d62828")
+    property string powerLock: icon(themeColor("powerLock", "#628ae2"))
+    property string powerSleep: icon(themeColor("powerSleep", "#9d6fff"))
+    property string powerLogout: icon(themeColor("powerLogout", "#f4a232"))
+    property string powerRestart: icon(themeColor("powerRestart", "#ff6b35"))
+    property string powerShutdown: icon(themeColor("powerShutdown", "#d62828"))
     property string powerLogoutPending: themeColor("powerLogoutPending", "#ea9d34")
     property string powerRestartConfirm: themeColor("powerRestartConfirm", "#ff6c25")
     property string powerLogoutConfirm: themeColor("powerLogoutConfirm", "#e07e20")
 
-    // weather (icons are monochrome by default; fog stays dimmer)
+    // weather
     property string weatherText: themeColor("weatherText", "#ecebeb")
     property string weatherCondition: themeColor("weatherCondition", "#7e7e7e")
     property string weatherTemp: themeColor("weatherTemp", "#a0a0a0")
     property string weatherDay: themeColor("weatherDay", "#6e6e6e")
-    property string weatherFeels: themeColor("weatherFeels", fg)
-    property string weatherHumidity: themeColor("weatherHumidity", fg)
-    property string weatherWind: themeColor("weatherWind", fg)
-    property string weatherSunrise: themeColor("weatherSunrise", fg)
-    property string weatherSunset: themeColor("weatherSunset", fg)
-    property string weatherClear: themeColor("weatherClear", fg)
-    property string weatherCloudy: themeColor("weatherCloudy", fg)
-    property string weatherRain: themeColor("weatherRain", fg)
-    property string weatherThunder: themeColor("weatherThunder", fg)
-    property string weatherSnow: themeColor("weatherSnow", fg)
+    property string weatherFeels: icon(themeColor("weatherFeels", "#f18d41"))
+    property string weatherHumidity: icon(themeColor("weatherHumidity", "#5f99fa"))
+    property string weatherWind: icon(themeColor("weatherWind", "#54e04b"))
+    property string weatherSunrise: icon(themeColor("weatherSunrise", "#ffcd58"))
+    property string weatherSunset: icon(themeColor("weatherSunset", "#ff904d"))
+    property string weatherClear: icon(themeColor("weatherClear", "#f4c542"))
+    property string weatherCloudy: icon(themeColor("weatherCloudy", "#9aa0a6"))
+    property string weatherRain: icon(themeColor("weatherRain", "#4a9de8"))
+    property string weatherThunder: icon(themeColor("weatherThunder", "#e8b84a"))
+    property string weatherSnow: icon(themeColor("weatherSnow", "#d8e8f4"))
     property string weatherFog: fgMuted
 
     // widgets
     property string notificationFg: themeColor("notificationFg", "#9b9b9b")
-    property string notifFg: themeColor("notifFg", "#d8ad5c")
+    property string notifFg: icon(themeColor("notifFg", "#d8ad5c"))
+    property string notifFgOff: Config.monochromeIcons ? fg6 : netFgOff // no notifications
+    property string batteryOkFg: icon(ok) // battery icon when not low
     property string dateFg: themeColor("dateFg", "#9d9d9d")
     property string todayFg: themeColor("todayFg", "#ec3737")
     property string calendarBg: themeColor("calendarBg", "#1c1c1c")

@@ -5,7 +5,7 @@ import QtQuick.Layouts
 Item {
   id: root
   property int fontSize: 10 * Config.pillScale
-  readonly property real value: SysStats.memPercentShown
+  readonly property real value: SysStats.memPercent
   implicitWidth: row.implicitWidth
   implicitHeight: row.implicitHeight
 
@@ -18,7 +18,7 @@ Item {
       text: String.fromCodePoint(0xf035b) // nf-md-memory
       color: root.value >= 90 ? Theme.danger : root.value >= 70 ? Theme.warnMed : Theme.fg
       font { family: Theme.nerdFontFamily; pixelSize: root.fontSize }
-      Behavior on color { ColorAnimation { duration: SysStats.glide; easing.type: Easing.OutQuad } }
+      Behavior on color { ColorAnimation { duration: 350; easing.type: Easing.OutQuad } }
     }
 
     Text {

@@ -172,7 +172,7 @@ Scope {
     }
 
     function batteryColor(pct) {
-        return pct > 30 ? Theme.ok : (pct <= 15 ? Theme.danger : Theme.warnMed);
+        return pct > 30 ? Theme.batteryOkFg : (pct <= 15 ? Theme.danger : Theme.warnMed);
     }
 
     function onFailure() {

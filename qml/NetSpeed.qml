@@ -14,18 +14,20 @@ Item {
     spacing: 5 * Config.pillScale
 
     Text {
-      text: "↓" + SysStats.formatRate(SysStats.rxShown)
+      text: "↓" + SysStats.formatRate(SysStats.rxRate)
       color: Theme.fg
       // fixed width so the pill does not twitch as the number changes
       Layout.preferredWidth: metrics.width
+      horizontalAlignment: Text.AlignRight
       font: metrics.font
     }
 
     Text {
-      text: "↑" + SysStats.formatRate(SysStats.txShown)
+      text: "↑" + SysStats.formatRate(SysStats.txRate)
       color: Theme.fg
       opacity: 0.6
       Layout.preferredWidth: metrics.width
+      horizontalAlignment: Text.AlignRight
       font: metrics.font
     }
   }

@@ -14,6 +14,7 @@ Page {
     NumRow { label: "Pill top margin"; to: 200; suffix: "px"; value: ConfigStore.get("pillTopMargin", 9); onEdited: (v) => ConfigStore.set("pillTopMargin", v) }
     NumRow { label: "Pill bottom margin"; to: 200; suffix: "px"; value: ConfigStore.get("pillBottomMargin", 26); onEdited: (v) => ConfigStore.set("pillBottomMargin", v) }
     ToggleRow { label: "Audio visualizer"; hint: "Live spectrum in the Control Center's Media Player";  value: ConfigStore.get("showAudioVisuals", true); onEdited: (v) => ConfigStore.set("showAudioVisuals", v) }
+    ToggleRow { label: "Monochrome icons"; hint: "Show the Pill Bar and panel icons in the text colour instead of their own colours"; value: ConfigStore.get("monochromeIcons", false); onEdited: (v) => ConfigStore.set("monochromeIcons", v) }
     ToggleRow { label: "Shadows"; hint: "Drop shadows under the Pill Bar, its states, popups and the lockscreen"; value: ConfigStore.get("showShadows", true); onEdited: (v) => ConfigStore.set("showShadows", v) }
     Heading { text: "MEDIA PLAYER" }
     ScopeRow {

@@ -69,18 +69,21 @@ Item {
         bar.widths = a
     }
 
+    // monochromeIcons: the preview icons follow the text colour too
+    function ic(c) { return ConfigStore.get("monochromeIcons", false) ? Theme.fg : c }
+
     function sample(name) {
         switch (name) {
-        case "battery":       return { icon: String.fromCodePoint(0xf0081), color: Theme.batteryFg, text: "98%" }
+        case "battery":       return { icon: String.fromCodePoint(0xf0081), color: ic(Theme.batteryFg), text: "98%" }
         case "volume":        return { icon: String.fromCodePoint(0xf057e), color: Theme.fg,     text: "64%" }
         case "workspaces":    return { icon: "",       color: Theme.fg,     text: "", segments: true, n: Math.min(Math.max(ConfigStore.get("maxWorkspaces", 5), 1), 6) }
-        case "network":       return { icon: String.fromCodePoint(0xf0928), color: Theme.fg, text: ConfigStore.get("networkIconOnly", false) ? "" : "Home" }
+        case "network":       return { icon: String.fromCodePoint(0xf0928), color: ic(Theme.netFg), text: ConfigStore.get("networkIconOnly", false) ? "" : "Home" }
         case "clock":         return { icon: "",       color: Theme.fg,     text: Qt.formatTime(new Date(), ConfigStore.get("clockFormat", "hh:mm")) }
         case "brightness":    return { icon: String.fromCodePoint(0xf00e0), color: Theme.fg,     text: "84%" }
-        case "vpn":           return { icon: String.fromCodePoint(0xf099d), color: Theme.vpnFg, text: "on" }
-        case "notifications": return { icon: String.fromCodePoint(0xf0f3),  color: Theme.fg, text: "7" }
-        case "bluetooth":     return { icon: String.fromCodePoint(0xf00af), color: Theme.btFg, text: "on", iconSize: 13 }
-        case "weather":       return { icon: String.fromCodePoint(0xe312),  color: Theme.fg, text: "24°C", iconSize: 11 }
+        case "vpn":           return { icon: String.fromCodePoint(0xf099d), color: ic(Theme.vpnFg), text: "on" }
+        case "notifications": return { icon: String.fromCodePoint(0xf0f3),  color: ic(Theme.notifFg), text: "7" }
+        case "bluetooth":     return { icon: String.fromCodePoint(0xf00af), color: ic(Theme.btFg), text: "on", iconSize: 13 }
+        case "weather":       return { icon: String.fromCodePoint(0xe312),  color: ic(Theme.weatherFg), text: "24°C", iconSize: 11 }
         case "audioVisualizer": return { icon: "",       spectrum: true, color: Theme.fg,     text: "" }
         case "tray":          return { icon: String.fromCodePoint(0xf1294), color: Theme.fg, text: "tray" }
         case "cpu":           return { icon: String.fromCodePoint(0xf0ee0), color: Theme.fg, text: "12%" }

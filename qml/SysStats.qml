@@ -18,30 +18,17 @@ Singleton {
   readonly property bool wantRam: modules.includes("ram")
   readonly property bool wantNet: modules.includes("netSpeed")
 
-  // shown numbers ease to each new sample with the audio visualizer's OutQuad;
-  // short rather than the whole interval, since these tick on the always-on pill
-  readonly property int glide: 350
-
   property real cpuPercent: 0
-  property real cpuShown: cpuPercent
-  Behavior on cpuShown { NumberAnimation { duration: root.glide; easing.type: Easing.OutQuad } }
   property var cpuHistory: []
 
   property real memTotalKb: 0
   property real memUsedKb: 0
   readonly property real memPercent: memTotalKb > 0 ? memUsedKb / memTotalKb * 100 : 0
   property var memHistory: []
-  property real memUsedShown: memUsedKb
-  Behavior on memUsedShown { NumberAnimation { duration: root.glide; easing.type: Easing.OutQuad } }
-  readonly property real memPercentShown: memTotalKb > 0 ? memUsedShown / memTotalKb * 100 : 0
 
   // bytes per second, all physical interfaces summed
   property real rxRate: 0
   property real txRate: 0
-  property real rxShown: rxRate
-  property real txShown: txRate
-  Behavior on rxShown { NumberAnimation { duration: root.glide; easing.type: Easing.OutQuad } }
-  Behavior on txShown { NumberAnimation { duration: root.glide; easing.type: Easing.OutQuad } }
   property var rxHistory: []
   property var txHistory: []
   // [{ name, rx, tx }] per-interface rates, busiest first
@@ -53,7 +40,8 @@ Singleton {
     return next
   }
 
-  // short rate: "12B" "340K" "1.2M", in bits or bytes (netSpeedUnit)
+  // short rate: " 12B" "340K" "1.2M", in bits or bytes (netSpeedUnit);
+  // padded to 4 characters so the text keeps one width as the value changes
   function formatRate(bytesPerSec) {
     const bits = Config.netSpeedUnit === "bits"
     const step = bits ? 1000 : 1024
@@ -62,7 +50,7 @@ Singleton {
     let i = 0
     // roll over at 1000 so the text never grows past 4 characters
     while (v >= 999.5 && i < units.length - 1) { v /= step; i++ }
-    return (i > 0 && v < 9.95 ? v.toFixed(1) : Math.round(v)) + units[i]
+    return String((i > 0 && v < 9.95 ? v.toFixed(1) : Math.round(v)) + units[i]).padStart(4)
   }
 
   function formatKb(kb) {

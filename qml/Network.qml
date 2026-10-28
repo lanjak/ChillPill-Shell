@@ -8,7 +8,7 @@ RowLayout {
 
   spacing: 4 * Config.paddingScale
 
-  property string iconFg: Theme.fg
+  property string iconFg: Theme.netFg
   property string disconIconFg: Theme.netFgOff
 
   readonly property bool wifiEnabled: Networking.wifiEnabled

@@ -10,6 +10,7 @@
   "pillMonitor": "all",
   "hidePillOnFullscreen": true,
   "networkIconOnly": false,
+  "monochromeIcons": false,
   "textFontFamily": "Monocraft",
   "nerdFontFamily": "JetBrainsMono Nerd Font Propo",
   "timerPresets": [1, 5, 10, 15, 30],

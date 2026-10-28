@@ -82,9 +82,9 @@ Item {
 
   readonly property string title: kind === "ram" ? "Memory" : isNet ? "Network" : "CPU"
   readonly property string headline: kind === "ram"
-    ? SysStats.formatKb(SysStats.memUsedShown) + " / " + SysStats.formatKb(SysStats.memTotalKb)
-    : isNet ? "↓" + SysStats.formatRate(SysStats.rxShown) + "  ↑" + SysStats.formatRate(SysStats.txShown)
-    : Math.round(SysStats.cpuShown) + "%"
+    ? SysStats.formatKb(SysStats.memUsedKb) + " / " + SysStats.formatKb(SysStats.memTotalKb)
+    : isNet ? "↓" + SysStats.formatRate(SysStats.rxRate) + "  ↑" + SysStats.formatRate(SysStats.txRate)
+    : Math.round(SysStats.cpuPercent) + "%"
 
   // short staggered rise on open
   property real reveal: 0

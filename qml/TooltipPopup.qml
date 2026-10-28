@@ -125,12 +125,12 @@ PanelWindow {
         return s
       }
       case "cpu":
-        return "CPU " + Math.round(SysStats.cpuShown) + "% • last minute"
+        return "CPU " + Math.round(SysStats.cpuPercent) + "% • last minute"
       case "ram":
-        return "RAM " + SysStats.formatKb(SysStats.memUsedShown) + " / " + SysStats.formatKb(SysStats.memTotalKb)
-          + " • " + Math.round(SysStats.memPercentShown) + "%"
+        return "RAM " + SysStats.formatKb(SysStats.memUsedKb) + " / " + SysStats.formatKb(SysStats.memTotalKb)
+          + " • " + Math.round(SysStats.memPercent) + "%"
       case "netSpeed":
-        return "↓ " + SysStats.formatRate(SysStats.rxShown) + "  ↑ " + SysStats.formatRate(SysStats.txShown)
+        return "↓ " + SysStats.formatRate(SysStats.rxRate) + "  ↑ " + SysStats.formatRate(SysStats.txRate)
           + " • last minute"
       case "notifications": {
         const m = notificationModule
