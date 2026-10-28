@@ -106,8 +106,9 @@ Item {
     }
   }
 
-  // show battery in mini dashboard too
+  // show battery in mini dashboard too, but no plug icon on desktops
   Battery {
+    visible: box.hasBattery
     fontSize: 14
     anchors.top: parent.top
     anchors.right: parent.right

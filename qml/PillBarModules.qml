@@ -91,7 +91,7 @@ Row {
       }
       TapHandler {
         acceptedButtons: Qt.LeftButton
-        enabled: !isCustom && (modelData === "volume" || modelData === "network" || modelData === "bluetooth")
+        enabled: !isCustom && (modelData === "volume" || modelData === "network" || modelData === "bluetooth" || modelData === "settings")
         onTapped: {
           if (isCustom) return
           switch (modelData) {
@@ -106,6 +106,9 @@ Row {
             case "bluetooth":
               if (moduleLoader.item && moduleLoader.item.toggleBluetooth)
                 moduleLoader.item.toggleBluetooth()
+              break
+            case "settings":
+              Quickshell.execDetached(["chillpill-config"])
               break
           }
         }

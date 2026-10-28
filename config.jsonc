@@ -4,7 +4,7 @@
   "pillTopMargin": 9,
   "pillBottomMargin": 26,
   "theme": "",
-  "pillModules": ["battery", "volume", "workspaces", "network", "clock"],
+  "pillModules": ["battery", "volume", "workspaces", "network", "clock", "settings"],
   "pillOnHover": false,
   "textFontFamily": "Monocraft",
   "nerdFontFamily": "JetBrainsMono Nerd Font Propo",

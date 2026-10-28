@@ -15,81 +15,86 @@ ShellRoot {
 
   IpcHandler {
       target: "cliphist"
-      function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = !box.cliphistOpen; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false; box.themePicker = false }
-      function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = true; box.powerMenu = false; }
-      function hide(): void { box.cliphistOpen = false }
+      function toggle(): void { focusedBox.controlCenter = false; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = !focusedBox.cliphistOpen; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.themePicker = false }
+      function show(): void { focusedBox.controlCenter = false; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = true; focusedBox.powerMenu = false; }
+      function hide(): void { focusedBox.cliphistOpen = false }
   }
 
   IpcHandler {
       target: "controlCenter"
-      function toggle(): void { box.controlCenter = !box.controlCenter; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false; box.themePicker = false }
-      function show(): void { box.controlCenter = true; box.miniDashboard = false; box.cliphistOpen = false; box.powerMenu = false; }
-      function hide(): void { box.controlCenter = false }
+      function toggle(): void { focusedBox.controlCenter = !focusedBox.controlCenter; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.themePicker = false }
+      function show(): void { focusedBox.controlCenter = true; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.powerMenu = false; }
+      function hide(): void { focusedBox.controlCenter = false }
   }
 
   IpcHandler {
       target: "miniDashboard"
-      function toggle(): void { box.controlCenter = false; box.miniDashboard = !box.miniDashboard; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false; box.themePicker = false }
-      function show(): void { box.controlCenter = false; box.miniDashboard = true; box.cliphistOpen = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false; }
-      function hide(): void { box.miniDashboard = false }
+      function toggle(): void { focusedBox.controlCenter = false; focusedBox.miniDashboard = !focusedBox.miniDashboard; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.themePicker = false }
+      function show(): void { focusedBox.controlCenter = false; focusedBox.miniDashboard = true; focusedBox.cliphistOpen = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; }
+      function hide(): void { focusedBox.miniDashboard = false }
   }
 
   // alias for spotlight
   IpcHandler {
     target: "appLauncher"
-    function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = !box.spotlight; box.wallpaperSwitcherOpen = false; box.powerMenu = false; box.themePicker = false }
-    function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = true; box.powerMenu = false; }
-    function hide(): void { box.spotlight = false; box.wallpaperSwitcherOpen = false }
+    function toggle(): void { focusedBox.controlCenter = false; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = !focusedBox.spotlight; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.themePicker = false }
+    function show(): void { focusedBox.controlCenter = false; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = true; focusedBox.powerMenu = false; }
+    function hide(): void { focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false }
   }
 
   IpcHandler {
     target: "theme"
-    function toggle(): void { box.themePicker = !box.themePicker; box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false }
-    function show(): void { box.themePicker = true; box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false }
-    function hide(): void { box.themePicker = false }
+    function toggle(): void { focusedBox.themePicker = !focusedBox.themePicker; focusedBox.controlCenter = false; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false }
+    function show(): void { focusedBox.themePicker = true; focusedBox.controlCenter = false; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false }
+    function hide(): void { focusedBox.themePicker = false }
     function apply(name: string): void { Theme.applyTheme(name) }
   }
 
   IpcHandler {
     target: "spotlight"
-    function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = !box.spotlight; box.wallpaperSwitcherOpen = false; box.powerMenu = false; box.themePicker = false }
-    function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = true; box.powerMenu = false; }
-    function hide(): void { box.spotlight = false; box.wallpaperSwitcherOpen = false }
+    function toggle(): void { focusedBox.controlCenter = false; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = !focusedBox.spotlight; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.themePicker = false }
+    function show(): void { focusedBox.controlCenter = false; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = true; focusedBox.powerMenu = false; }
+    function hide(): void { focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false }
   }
 
   IpcHandler {
     target: "wallpaperSwitcher"
-    function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = !box.wallpaperSwitcherOpen; box.powerMenu = false; box.themePicker = false }
-    function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = true; box.powerMenu = false; }
-    function hide(): void { box.spotlight = false; box.wallpaperSwitcherOpen = false }
+    function toggle(): void { focusedBox.controlCenter = false; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = !focusedBox.wallpaperSwitcherOpen; focusedBox.powerMenu = false; focusedBox.themePicker = false }
+    function show(): void { focusedBox.controlCenter = false; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = true; focusedBox.powerMenu = false; }
+    function hide(): void { focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false }
   }
 
   IpcHandler {
     target: "powerMenu"
-    function toggle(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = !box.powerMenu; if (!box.powerMenu) box.powerMenuInitialAction = ""; box.themePicker = false }
-    function show(): void { box.controlCenter = false; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = true }
-    function hide(): void { box.powerMenu = false; box.powerMenuInitialAction = "" }
+    function toggle(): void { focusedBox.controlCenter = false; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = !focusedBox.powerMenu; if (!focusedBox.powerMenu) focusedBox.powerMenuInitialAction = ""; focusedBox.themePicker = false }
+    function show(): void { focusedBox.controlCenter = false; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = true }
+    function hide(): void { focusedBox.powerMenu = false; focusedBox.powerMenuInitialAction = "" }
   }
 
   IpcHandler {
     target: "wifiState"
-    function toggle(): void { box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false; box.bluetoothPanelOpen = false; box.wifiPanelOpen = !box.wifiPanelOpen; box.controlCenter = box.wifiPanelOpen; box.themePicker = false }
-    function show(): void { box.controlCenter = true; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false; box.bluetoothPanelOpen = false; box.wifiPanelOpen = true }
-    function hide(): void { box.powerMenu = false; box.wifiPanelOpen = false }
+    function toggle(): void { focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.bluetoothPanelOpen = false; focusedBox.wifiPanelOpen = !focusedBox.wifiPanelOpen; focusedBox.controlCenter = focusedBox.wifiPanelOpen; focusedBox.themePicker = false }
+    function show(): void { focusedBox.controlCenter = true; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.bluetoothPanelOpen = false; focusedBox.wifiPanelOpen = true }
+    function hide(): void { focusedBox.powerMenu = false; focusedBox.wifiPanelOpen = false }
   }
 
   IpcHandler {
     target: "bluetoothState"
-    function toggle(): void { box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false; box.wifiPanelOpen = false; box.bluetoothPanelOpen = !box.bluetoothPanelOpen; box.controlCenter = box.bluetoothPanelOpen; box.themePicker = false }
-    function show(): void { box.controlCenter = true; box.miniDashboard = false; box.cliphistOpen = false; box.spotlight = false; box.wallpaperSwitcherOpen = false; box.powerMenu = false; box.wifiPanelOpen = false; box.bluetoothPanelOpen = true }
-    function hide(): void { box.powerMenu = false; box.bluetoothPanelOpen = false }
+    function toggle(): void { focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.wifiPanelOpen = false; focusedBox.bluetoothPanelOpen = !focusedBox.bluetoothPanelOpen; focusedBox.controlCenter = focusedBox.bluetoothPanelOpen; focusedBox.themePicker = false }
+    function show(): void { focusedBox.controlCenter = true; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.wifiPanelOpen = false; focusedBox.bluetoothPanelOpen = true }
+    function hide(): void { focusedBox.powerMenu = false; focusedBox.bluetoothPanelOpen = false }
   }
 
   function capitalize(str) {
       return str.charAt(0).toUpperCase() + str.slice(1)
   }
 
-  property bool pillHoverActive: false
+  // IPC and the root-level OSDs act on the pill of the monitor under focus (follows the mouse)
+  readonly property var focusedBox: {
+    const wins = pillWindows.instances
+    const w = wins.find(w => w.screen && Hyprland.focusedMonitor && w.screen.name === Hyprland.focusedMonitor.name) || wins[0]
+    return w ? w.pill : null
+  }
 
   property string bg: Theme.bg
   property string fg: Theme.fg
@@ -139,9 +144,21 @@ ShellRoot {
     onExited: (exitCode) => { shellRoot.cavaAvailable = (exitCode === 0) }
   }
 
+  // one pill per monitor. Indent kept as upstream's single window to keep upstream merges clean.
+  Variants {
+  id: pillWindows
+  model: Quickshell.screens
   PanelWindow {
     id: panelWindow
-    WlrLayershell.layer: WlrLayershell.Top
+    required property var modelData
+    screen: modelData
+    property alias pill: box
+    property bool pillHoverActive: false
+    // hide only on the monitor that shows the focused fullscreen window
+    readonly property bool fullscreenHere: fullscreenActive
+      && ToplevelManager.activeToplevel.screens.some(s => s.name === screen.name)
+    // overlay, so the pill shows over a fullscreen window that has lost focus
+    WlrLayershell.layer: WlrLayershell.Overlay
     WlrLayershell.keyboardFocus: (box.wifiPanelOpen || box.bluetoothPanelOpen || box.cliphistOpen || box.spotlight || box.wallpaperSwitcherOpen || box.themePicker || box.powerMenu ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None)
     implicitHeight: Math.max(885 * scale, calendarLoader.item && calendarLoader.item.visible
             ? calendarLoader.y + calendarLoader.item.height : 0)
@@ -164,14 +181,15 @@ ShellRoot {
       Region {
         intersection: Intersection.Combine
         x: Math.floor(box.x - box.width * (box.dpi - 1) / 2); y: Math.floor(box.y)
-        width: Math.ceil(box.width * box.dpi); height: Math.ceil(box.height * box.dpi)
+        // no input while hidden, or the invisible pill would eat clicks over fullscreen apps
+        width: box.visible ? Math.ceil(box.width * box.dpi) : 0; height: box.visible ? Math.ceil(box.height * box.dpi) : 0
       }
       // top band to catch the cursor while the pill is hidden in pillOnHover
       Region {
         intersection: Intersection.Combine
         x: 0; y: 0
-        width: (Config.pillOnHover && !box.revealed) ? Math.ceil(panelWindow.width) : 0
-        height: (Config.pillOnHover && !box.revealed) ? Math.ceil(hoverRevealAreaItem.height) : 0
+        width: (Config.pillOnHover && !box.revealed && !panelWindow.fullscreenHere) ? Math.ceil(panelWindow.width) : 0
+        height: (Config.pillOnHover && !box.revealed && !panelWindow.fullscreenHere) ? Math.ceil(hoverRevealAreaItem.height) : 0
       }
       Region {
         intersection: Intersection.Combine
@@ -205,7 +223,7 @@ ShellRoot {
       HoverHandler {
         id: revealHover
         onHoveredChanged: {
-          if (hovered) { shellRoot.pillHoverActive = true; hidePillTimer.stop() }
+          if (hovered) { panelWindow.pillHoverActive = true; hidePillTimer.stop() }
           else if (!pillHover.hovered) hidePillTimer.start()
         }
       }
@@ -214,7 +232,7 @@ ShellRoot {
     Timer {
       id: hidePillTimer
       interval: 250
-      onTriggered: shellRoot.pillHoverActive = false
+      onTriggered: panelWindow.pillHoverActive = false
     }
 
     // shadow under the pill, drawn as its own item so the pill itself stays
@@ -259,7 +277,7 @@ ShellRoot {
       anchors.top: parent.top
       anchors.horizontalCenter: parent.horizontalCenter
       readonly property bool revealed: !Config.pillOnHover
-        || shellRoot.pillHoverActive
+        || panelWindow.pillHoverActive
         || controlCenter
         || miniDashboard
         || cliphistOpen
@@ -270,7 +288,7 @@ ShellRoot {
         || mediaPopupShown
         || (notificationModule.active && !notifFullscreenMode)
         || (activeOsd !== "")
-      opacity: revealed && (!fullscreenActive && !notifFullscreenMode) ? 1 : 0
+      opacity: revealed && (!panelWindow.fullscreenHere && !notifFullscreenMode) ? 1 : 0
 
       Behavior on opacity {
         NumberAnimation { duration: 220; easing.type: Easing.OutExpo }
@@ -283,6 +301,7 @@ ShellRoot {
       property var networkModule: null
       property var bluetoothModule: null
       property var clockModule: clock
+      property var brightnessSource: brightnessModule
       property var vpnModule: null
 
       property bool tooltipVisible: false
@@ -609,7 +628,7 @@ ShellRoot {
         id: pillHover
         target: box
         onHoveredChanged: {
-          if (hovered) { shellRoot.pillHoverActive = true; hidePillTimer.stop() }
+          if (hovered) { panelWindow.pillHoverActive = true; hidePillTimer.stop() }
           else if (!revealHover.hovered) hidePillTimer.start()
         }
       }
@@ -1094,15 +1113,6 @@ ShellRoot {
         }
     }
 
-    Timer {
-        id: mediaPopupHideTimer
-        interval: Config.mediaPopupDuration
-        repeat: false
-        onTriggered: {
-          if (mediaAutoOpened) mediaAutoOpened = false
-        }
-    }
-
     Connections {
       target: countdownModule
       function onTimerFinished() {
@@ -1112,8 +1122,19 @@ ShellRoot {
       }
     }
   }
+  }
 
   MprisModule { id: mprisModule; visible: false }
+
+  // shared by every pill, so it lives here and not in each monitor's window
+  Timer {
+    id: mediaPopupHideTimer
+    interval: Config.mediaPopupDuration
+    repeat: false
+    onTriggered: {
+      if (mediaAutoOpened) mediaAutoOpened = false
+    }
+  }
 
   CountdownModule { id: countdownModule; visible: false }
 
@@ -1139,19 +1160,19 @@ ShellRoot {
   FullscreenOsd {
     id: fsNotif
     active: notificationModule.active && notifFullscreenMode
-    cardWidth: 300 * box.dpi
-    cardHeight: 52 * box.dpi
+    cardWidth: 300 * focusedBox.dpi
+    cardHeight: 52 * focusedBox.dpi
 
     property var displayNotif: null
 
     RowLayout {
       Layout.alignment: Qt.AlignVCenter
-      spacing: 12 * box.dpi
+      spacing: 12 * focusedBox.dpi
 
       Text {
         text: String.fromCodePoint(0xf0f3)
         color: Theme.fg
-        font { family: Theme.nerdFontFamily; pixelSize: 14 * box.dpi }
+        font { family: Theme.nerdFontFamily; pixelSize: 14 * focusedBox.dpi }
         visible: cardIcon.status !== Image.Ready
       }
 
@@ -1168,18 +1189,18 @@ ShellRoot {
           }
           return ""
         }
-        sourceSize: Qt.size(23 * box.dpi, 23 * box.dpi)
+        sourceSize: Qt.size(23 * focusedBox.dpi, 23 * focusedBox.dpi)
         visible: status === Image.Ready
       }
 
       ColumnLayout {
-        spacing: 3 * box.dpi
+        spacing: 3 * focusedBox.dpi
 
         Text {
           text: fsNotif.displayNotif ? fsNotif.displayNotif.summary : ""
           textFormat: Text.PlainText
           color: Theme.fg
-          font { family: Theme.fontFamily; pixelSize: 10 * box.dpi; weight: 700 }
+          font { family: Theme.fontFamily; pixelSize: 10 * focusedBox.dpi; weight: 700 }
           elide: Text.ElideRight
           Layout.maximumWidth: 200
         }
@@ -1192,7 +1213,7 @@ ShellRoot {
           textFormat: Text.StyledText
           linkColor: Theme.accent
           color: Theme.fg4
-          font { family: Theme.fontFamily; pixelSize: 9 * box.dpi }
+          font { family: Theme.fontFamily; pixelSize: 9 * focusedBox.dpi }
           elide: Text.ElideRight
           visible: text !== ""
           Layout.maximumWidth: 200
@@ -1206,8 +1227,8 @@ ShellRoot {
     function onActiveChanged() {
         if (notificationModule.active) {
             notifFullscreenMode = fullscreenActive
-            box.wifiPanelOpen = false
-            box.bluetoothPanelOpen = false
+            focusedBox.wifiPanelOpen = false
+            focusedBox.bluetoothPanelOpen = false
         } else {
             notifFullscreenMode = false
         }
@@ -1220,29 +1241,29 @@ ShellRoot {
   // volume OSD over fullscreen windows
   FullscreenOsd {
     id: fsVolume
-    active: box.activeOsd === "volume"
+    active: focusedBox.activeOsd === "volume"
       && fullscreenActive
       && !notifFullscreenMode
-    cardWidth: 220 * box.dpi
-    cardHeight: 42 * box.dpi
+    cardWidth: 220 * focusedBox.dpi
+    cardHeight: 42 * focusedBox.dpi
 
-    readonly property var volModule: box.volumeModule
+    readonly property var volModule: focusedBox.volumeModule
 
     RowLayout {
       Layout.alignment: Qt.AlignVCenter
-      spacing: 12 * box.dpi
+      spacing: 12 * focusedBox.dpi
 
       Text {
         text: fsVolume.volModule ? fsVolume.volModule.icon : ""
         color: fsVolume.volModule && fsVolume.volModule.muted ? fsVolume.volModule.mutedColor : Theme.fg
-        font { family: Theme.nerdFontFamily; pixelSize: 16 * box.dpi }
+        font { family: Theme.nerdFontFamily; pixelSize: 16 * focusedBox.dpi }
       }
 
       // same bar geometry and fill speed as the pill OSD
       Rectangle {
-        width: 90 * box.dpi
-        height: 4 * box.dpi
-        radius: 2 * box.dpi
+        width: 90 * focusedBox.dpi
+        height: 4 * focusedBox.dpi
+        radius: 2 * focusedBox.dpi
         color: Theme.bg1
         Layout.alignment: Qt.AlignVCenter
 
@@ -1258,7 +1279,7 @@ ShellRoot {
       Text {
         text: fsVolume.volModule ? (fsVolume.volModule.muted ? "muted" : fsVolume.volModule.intendedVol + "%") : ""
         color: Theme.fg
-        font { family: Theme.fontFamily; pixelSize: 10 * box.dpi; weight: 600 }
+        font { family: Theme.fontFamily; pixelSize: 10 * focusedBox.dpi; weight: 600 }
         Layout.alignment: Qt.AlignVCenter
       }
     }
@@ -1267,30 +1288,30 @@ ShellRoot {
   // brightness OSD over fullscreen windows
   FullscreenOsd {
     id: fsBrightness
-    active: box.activeOsd === "brightness" && fullscreenActive && !notifFullscreenMode
-    cardWidth: 220 * box.dpi
-    cardHeight: 42 * box.dpi
+    active: focusedBox.activeOsd === "brightness" && fullscreenActive && !notifFullscreenMode
+    cardWidth: 220 * focusedBox.dpi
+    cardHeight: 42 * focusedBox.dpi
 
     RowLayout {
       Layout.alignment: Qt.AlignVCenter
-      spacing: 12 * box.dpi
+      spacing: 12 * focusedBox.dpi
 
       Text {
-        text: brightnessModule.icon
+        text: focusedBox.brightnessSource.icon
         color: Theme.fg
-        font { family: Theme.nerdFontFamily; pixelSize: 16 * box.dpi }
+        font { family: Theme.nerdFontFamily; pixelSize: 16 * focusedBox.dpi }
       }
 
       // same bar geometry and fill speed as the pill OSD
       Rectangle {
-        width: 100 * box.dpi
-        height: 4 * box.dpi
-        radius: 2 * box.dpi
+        width: 100 * focusedBox.dpi
+        height: 4 * focusedBox.dpi
+        radius: 2 * focusedBox.dpi
         color: Theme.bg1
         Layout.alignment: Qt.AlignVCenter
 
         Rectangle {
-          width: parent.width * brightnessModule.percent
+          width: parent.width * focusedBox.brightnessSource.percent
           height: parent.height
           radius: parent.radius
           color: Theme.fg
@@ -1299,9 +1320,9 @@ ShellRoot {
       }
 
       Text {
-        text: Math.round(brightnessModule.percent * 100) + "%"
+        text: Math.round(focusedBox.brightnessSource.percent * 100) + "%"
         color: Theme.fg
-        font { family: Theme.fontFamily; pixelSize: 10 * box.dpi; weight: 600 }
+        font { family: Theme.fontFamily; pixelSize: 10 * focusedBox.dpi; weight: 600 }
         Layout.alignment: Qt.AlignVCenter
       }
     }
@@ -1312,8 +1333,8 @@ ShellRoot {
     id: cavaProc
     command: ["sh", "-c", "cava -p ~/.cache/chillpill-shell/cava.conf"]
     running: shellRoot.cavaAvailable
-             && ((Config.showAudioVisuals && box.controlCenter)
-                 || (box.revealed && shellRoot.pillHasVisualizer))
+             && ((Config.showAudioVisuals && focusedBox.controlCenter)
+                 || (focusedBox.revealed && shellRoot.pillHasVisualizer))
     stdout: SplitParser {
       splitMarker: "\n"
       onRead: data => {
