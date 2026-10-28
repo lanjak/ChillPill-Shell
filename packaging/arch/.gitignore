@@ -1,0 +1,4 @@
+src/
+pkg/
+chillpill-shell/
+*.pkg.tar.*

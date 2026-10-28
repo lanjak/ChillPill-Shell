@@ -1,0 +1,75 @@
+# Maintainer: rufi <jakethedj@gmail.com>
+_pkgname=chillpill-shell
+pkgname=chillpill-shell-lanjak-git
+pkgver=0.14.0.r3.g794389d
+pkgrel=1
+pkgdesc="Lightweight and feature rich dynamic pill bar for Hyprland (lanjak fork, git version)"
+arch=('x86_64')
+url="https://git.lanjak.net/rufi/ChillPill-Shell"
+license=('GPL-3.0-only')
+depends=(
+       'cliphist'
+       'nusgmon-git'
+       'inotify-tools'
+       'brightnessctl'
+       'wl-clipboard'
+       'quickshell'
+       'qt6-base'
+       'qt6-declarative'
+       'qt6-multimedia'
+       'qt6-wayland'
+       'hyprland'
+       'pipewire'
+       'awww'
+       'networkmanager'
+       'bash'
+       'python'
+)
+optdepends=(
+         'ttf-jetbrains-mono-nerd: UI and nerd icon font'
+         'ttf-monocraft-nerd: default text font'
+         'qt6-imageformats: extra image formats in previews'
+         'python-holidays: calendar holiday events'
+         'cava: audio visualizer'
+         'blueman: bluetooth module'
+)
+makedepends=('git' 'cmake')
+provides=("$_pkgname" "$_pkgname-git")
+conflicts=("$_pkgname" "$_pkgname-git")
+options=('!debug')
+install="$_pkgname.install"
+source=("$_pkgname::git+$url.git")
+sha256sums=('SKIP')
+
+pkgver() {
+  cd "$_pkgname"
+  git describe --long --tags --abbrev=7 | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g'
+}
+
+build() {
+  cmake -S "$_pkgname" -B build -DCMAKE_BUILD_TYPE=Release
+  cmake --build build
+}
+
+package() {
+  cd "$_pkgname"
+
+  install -d "$pkgdir/usr/share/$_pkgname/PillBackend"
+  cp -r scripts share config-app "$pkgdir/usr/share/$_pkgname"
+  install -m 644 qml/* "$pkgdir/usr/share/$_pkgname"
+  chmod 755 "$pkgdir/usr/share/$_pkgname/scripts/config_update.py"
+
+  install -m 644 \
+    ../build/libPillBackend.so \
+    ../build/libPillBackendPlugin.so \
+    ../build/qmldir \
+    ../build/PillBackend.qmltypes \
+    "$pkgdir/usr/share/$_pkgname/PillBackend"
+
+  install -Dm755 launcher.sh "$pkgdir/usr/bin/chillpill-shell"
+  install -Dm755 config-launcher.sh "$pkgdir/usr/bin/chillpill-config"
+  install -Dm755 lockscreen.sh "$pkgdir/usr/bin/chillpill-lock"
+  install -Dm644 chillpill.desktop "$pkgdir/usr/share/applications/chillpill.desktop"
+  install -Dm644 chillpill-config.desktop "$pkgdir/usr/share/applications/chillpill-config.desktop"
+  install -Dm644 config.jsonc "$pkgdir/usr/share/$_pkgname/config.jsonc.example"
+}
