@@ -82,6 +82,7 @@ Item {
         case "bluetooth":     return { icon: String.fromCodePoint(0xf00af), color: Theme.btFg, text: "on", iconSize: 13 }
         case "weather":       return { icon: String.fromCodePoint(0xe312),  color: Theme.weatherFg, text: "24°C", iconSize: 11 }
         case "audioVisualizer": return { icon: "",       spectrum: true, color: Theme.fg,     text: "" }
+        case "tray":          return { icon: String.fromCodePoint(0xf0a0), color: Theme.fg, text: "tray" }
         default:              return { icon: String.fromCodePoint(0xf016),  color: Theme.fg4,    text: name }
         }
     }
