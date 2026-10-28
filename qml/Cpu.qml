@@ -21,12 +21,10 @@ Item {
       Behavior on color { ColorAnimation { duration: 350; easing.type: Easing.OutQuad } }
     }
 
-    Text {
+    // fixed width (padded text), changed digits roll
+    RollingText {
       text: SysStats.formatPercent(root.value)
-      color: Theme.fg
-      // fixed width so the pill does not twitch as the number changes
-      Layout.preferredWidth: metrics.width
-      horizontalAlignment: Text.AlignRight
+      value: root.value
       font: metrics.font
     }
   }

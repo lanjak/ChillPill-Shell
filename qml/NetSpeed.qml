@@ -13,22 +13,16 @@ Item {
     anchors.centerIn: parent
     spacing: 5 * Config.pillScale
 
-    Text {
-      text: "↓" + SysStats.formatRate(SysStats.rxRate)
-      color: Theme.fg
-      // fixed width so the pill does not twitch as the number changes
-      Layout.preferredWidth: metrics.width
-      horizontalAlignment: Text.AlignRight
-      font: metrics.font
+    // fixed width (padded rates), changed digits roll
+    Row {
+      Text { text: "↓"; color: Theme.fg; font: metrics.font }
+      RollingText { text: SysStats.formatRate(SysStats.rxRate); value: SysStats.rxRate; font: metrics.font }
     }
 
-    Text {
-      text: "↑" + SysStats.formatRate(SysStats.txRate)
-      color: Theme.fg
+    Row {
       opacity: 0.6
-      Layout.preferredWidth: metrics.width
-      horizontalAlignment: Text.AlignRight
-      font: metrics.font
+      Text { text: "↑"; color: Theme.fg; font: metrics.font }
+      RollingText { text: SysStats.formatRate(SysStats.txRate); value: SysStats.txRate; font: metrics.font }
     }
   }
 

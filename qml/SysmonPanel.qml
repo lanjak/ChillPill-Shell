@@ -4,7 +4,7 @@ import QtQuick
 import QtQuick.Layouts
 
 // cpu / ram / netSpeed pill module panel: the last minute as a graph, then the
-// busiest processes (cpu, ram) or interfaces (netSpeed), refreshed every 2s
+// busiest processes (cpu, ram) or interfaces (netSpeed), refreshed every second
 Item {
   id: panel
 
@@ -27,7 +27,7 @@ Item {
   function fill(list) {
     const top = Math.max(1e-9, ...list.map(r => r.value))
     for (let i = 0; i < list.length; i++) {
-      const r = { name: list[i].name, text: list[i].text, share: list[i].value / top }
+      const r = { name: list[i].name, text: list[i].text, value: list[i].value, share: list[i].value / top }
       if (i < rows.count) rows.set(i, r)
       else rows.append(r)
     }
@@ -48,7 +48,7 @@ Item {
     }
   }
 
-  // one long-lived top streams a frame every 2s while the panel is open
+  // one long-lived top streams a frame every second while the panel is open
   property var frame: []
   property bool inTable: false
 
@@ -59,7 +59,7 @@ Item {
 
   Process {
     running: !panel.isNet
-    command: ["top", "-b", "-d", "2", "-w", "512", "-o", panel.kind === "ram" ? "RES" : "%CPU"]
+    command: ["top", "-b", "-d", String(SysStats.interval / 1000), "-w", "512", "-o", panel.kind === "ram" ? "RES" : "%CPU"]
     // no toprc: a user's saved field layout would break the column parsing
     environment: ({ "HOME": "/nonexistent", "XDG_CONFIG_HOME": "/nonexistent" })
     stdout: SplitParser {
@@ -107,8 +107,9 @@ Item {
         font { family: Theme.fontFamily; pixelSize: 16 }
       }
       Item { Layout.fillWidth: true }
-      Text {
+      RollingText {
         text: panel.headline
+        value: panel.kind === "ram" ? SysStats.memUsedKb : panel.isNet ? SysStats.rxRate : SysStats.cpuPercent
         color: Theme.fg3
         font { family: Theme.fontFamily; pixelSize: 13 }
       }
@@ -154,6 +155,7 @@ Item {
           required property int index
           required property string name
           required property string text
+          required property real value
           required property real share
           width: parent.width
           height: 21
@@ -185,12 +187,13 @@ Item {
             font { family: Theme.fontFamily; pixelSize: 11 }
           }
 
-          Text {
+          RollingText {
             id: valueText
             anchors.right: parent.right
             anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
             text: rowItem.text
+            value: rowItem.value
             color: Theme.fg3
             font { family: Theme.fontFamily; pixelSize: 11 }
           }

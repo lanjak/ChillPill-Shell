@@ -9,7 +9,7 @@ import QtQuick
 Singleton {
   id: root
 
-  readonly property int interval: 2000
+  readonly property int interval: 1000
   // one minute of samples for the hover graph, plus two that sit past its
   // left edge, so the oldest point slides out instead of vanishing on screen
   readonly property int graphSlots: 60000 / interval

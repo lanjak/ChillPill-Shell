@@ -12,8 +12,8 @@ Canvas {
   // 0 scales to the biggest sample (network), percentages pass 100
   property real maxValue: 0
   // SysStats.graphSlots / .interval; literals so the tooltip does not build SysStats on its own
-  property int slots: 30
-  property int sampleInterval: 2000
+  property int slots: 60
+  property int sampleInterval: 1000
 
   // like the audio visualizer, motion spans the whole gap to the next sample
   // so the graph never stops between them: the line slides one slot left at
