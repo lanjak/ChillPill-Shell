@@ -52,7 +52,8 @@ Row {
       readonly property bool isCustom: typeof modelData === "object" && modelData !== null
       readonly property string moduleID: isCustom ? "custom" + index : String(modelData)
 
-      visible: !isCustom || !!modelData.run
+      // a module can report empty (tray with no icons) to drop out of the row and its spacing
+      visible: (!isCustom || !!modelData.run) && !(moduleLoader.item && moduleLoader.item.empty === true)
 
       Loader {
         id: moduleLoader

@@ -10,7 +10,8 @@ RowLayout {
   id: root
   property int iconSize: 14 * Config.pillScale
   spacing: 6 * Config.paddingScale
-
+  // nothing to show: PillBarModules hides the module so it leaves no gap
+  readonly property bool empty: !SystemTray.items.values.some(i => i.status !== Status.Passive)
 
   Repeater {
     model: SystemTray.items
@@ -28,6 +29,15 @@ RowLayout {
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
         cursorShape: Qt.PointingHandCursor
+        hoverEnabled: true
+        // per-icon tooltip through the shared popup (TooltipPopup's "tray" case);
+        // callLater so it runs after PillBarModules' module-wide hover handler
+        onEntered: Qt.callLater(() => {
+          const item = trayIcon.modelData
+          box.customTooltipText = item.tooltipTitle || item.title || item.id
+          box.tooltipX = trayIcon.mapToGlobal(trayIcon.width / 2, 0).x
+          box.tooltipVisible = box.customTooltipText !== ""
+        })
         onClicked: (mouse) => {
           const item = trayIcon.modelData
           if (mouse.button === Qt.MiddleButton) {

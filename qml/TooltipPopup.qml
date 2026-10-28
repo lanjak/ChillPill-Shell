@@ -12,10 +12,12 @@ PanelWindow {
 
   readonly property real effectiveScale: Config.dpiScale * Config.pillScale
 
+  // same monitor as its pill; tooltipX/Y are global, the margins are per monitor
+  screen: panelWindow.screen
   anchors.top: true
   anchors.left: true
-  margins.top: box.tooltipY + effectiveScale * 18
-  margins.left: box.tooltipX - implicitWidth / 2
+  margins.top: box.tooltipY - screen.y + effectiveScale * 18
+  margins.left: box.tooltipX - screen.x - implicitWidth / 2
 
   implicitWidth: label.implicitWidth + 16 * effectiveScale
   implicitHeight: label.implicitHeight + 10 * effectiveScale
@@ -50,6 +52,8 @@ PanelWindow {
     // waybar-style custom modules render their own tooltip (tooltip/{tooltip})
     // and hand it to the popup through box.customTooltipText
     if (box.tooltipModule.startsWith("custom")) return box.customTooltipText
+    // the tray sets the hovered icon's tooltip the same way
+    if (box.tooltipModule === "tray") return box.customTooltipText
     if (refreshTick < 0) return "" // force dependency on refreshTick so content re-evaluates
     switch (box.tooltipModule) {
       case "battery": {
