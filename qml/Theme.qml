@@ -124,7 +124,7 @@ Singleton {
         return v === undefined || v === null || v === "" ? def : v
     }
 
-    readonly property bool isLight: themePreset && themePreset.variant === "light"
+    readonly property bool isLight: !!themePreset && themePreset.variant === "light"
     function chipHover(c) {
         const col = Qt.color(c)
         if (!isLight) return Qt.lighter(col, 1.2)
