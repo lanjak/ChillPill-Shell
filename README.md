@@ -41,6 +41,53 @@ into your session at all times. It's not bound to any dotfiles.
 
 ---
 
+## Changes in this fork (lanjak)
+
+This fork lives at [git.lanjak.net/rufi/ChillPill-Shell](https://git.lanjak.net/rufi/ChillPill-Shell) and tracks [upstream](https://github.com/LUCKYS1NGHH/ChillPill-Shell). It adds these changes on top of upstream:
+
+**New pill modules**
+- `tray`: system tray icons (StatusNotifierItem). Left click activates an icon, middle click runs its secondary action, and right click opens its menu. Wine and other XEmbed icons (through `xembedsniproxy`) also open their menu on right click. Hover shows the icon's tooltip. The module hides itself when there are no icons.
+- `cpu`, `ram` and `netSpeed`: CPU use, memory use, and download and upload rates.
+  - Hover shows a graph of the last minute. Click opens a panel with a larger graph and the 7 busiest processes (cpu, ram) or network interfaces (netSpeed).
+  - The graphs sample every 2s and scroll smoothly. The numbers update every 5s, and only the digits that change roll in.
+  - The numbers have a fixed width, so the pill does not change size as they change.
+  - Process CPU use is a share of the whole CPU, not of one core.
+  - `netSpeedUnit` selects `bytes` (K = KiB/s) or `bits` (K = kbit/s).
+  - The modules read `/proc` only when they are in `pillModules`. The process list runs `top` only while the panel is open.
+
+**Audio panel**
+- Click the volume percentage to show the audio devices in the control center, in the same size and style. Click a device to make it the default output or input. Each device has a mute button, and devices on a sound card have a power button that disables them (the card profile "Off"). A disabled device stays in the list, so you can turn it on again.
+- Click the speaker icon of the volume module to mute.
+- IPC: `qs ipc -p /usr/share/chillpill-shell call audioState toggle`.
+
+**Options**
+- `pillMonitor`: `"all"` shows a pill on every monitor. A monitor name shows one pill on that monitor, or on the first monitor when it is not connected.
+- `hidePillOnFullscreen`: when off, the pill stays visible over fullscreen apps.
+- `networkIconOnly`: the network module shows only its icon, without the network name.
+- `monochromeIcons`: icons use the text colour instead of their own colours. Status colours (muted, low battery, danger) stay.
+- The config app shows all of these options. When the saved monitor is not connected, the Monitor option still shows it.
+
+**Other changes**
+- The settings module is gone. The mini dashboard has a settings button at the top right.
+- The network module shows "LAN" for Ethernet and "USB" only for USB tethering.
+- Quickshell starts in QApplication mode, which tray menus need.
+
+**Fixes**
+- The power buttons in the mini dashboard showed empty boxes. They now use the Nerd Font.
+- Tooltips on a monitor to the right of the first monitor were off screen. Each tooltip now shows on its own pill's monitor.
+- The weather forecast temperatures always showed 0.
+- Weather icon colours now follow theme changes without a new fetch.
+- `Theme.qml` logged a type warning at startup when no theme preset was set.
+
+**Arch package**
+- `packaging/arch/PKGBUILD` builds `chillpill-shell-lanjak-git` from this fork. It replaces `chillpill-shell` and `chillpill-shell-git`:
+
+```bash
+cd packaging/arch && makepkg -si
+```
+
+---
+
 ### Resource Usage
 
 - RAM: 200-500 MB (Average 400)
@@ -127,7 +174,7 @@ into your session at all times. It's not bound to any dotfiles.
 
 - DPI and Pill scaling is available in the config if you need it.
 
-- Audio, workspaces, bluetooth and wifi in pill bar are clickable. Clicking the volume module shows the output and input devices in the control center: pick the default device, mute it, or disable it.
+- Audio, workspaces, bluetooth and wifi in pill bar are clickable. Click the speaker icon of the volume module to mute. Click its percentage to show the output and input devices in the control center: pick the default device, mute it, or disable it.
 
 - Control center's media player progress bar is not only for status, it's usable to control the media you are playing.
   Timer minutes can be changed by right click, and you can hold-to-burst (stop) to halt the running timer.
