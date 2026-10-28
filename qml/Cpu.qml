@@ -5,7 +5,7 @@ import QtQuick.Layouts
 Item {
   id: root
   property int fontSize: 10 * Config.pillScale
-  readonly property real value: SysStats.cpuPercent
+  readonly property real value: SysStats.cpuShown
   implicitWidth: row.implicitWidth
   implicitHeight: row.implicitHeight
 

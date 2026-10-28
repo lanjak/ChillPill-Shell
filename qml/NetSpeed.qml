@@ -16,13 +16,13 @@ Item {
     // fixed width (padded rates), changed digits roll
     Row {
       Text { text: "↓"; color: Theme.fg; font: metrics.font }
-      RollingText { text: SysStats.formatRate(SysStats.rxRate); value: SysStats.rxRate; font: metrics.font }
+      RollingText { text: SysStats.formatRate(SysStats.rxShown); value: SysStats.rxShown; font: metrics.font }
     }
 
     Row {
       opacity: 0.6
       Text { text: "↑"; color: Theme.fg; font: metrics.font }
-      RollingText { text: SysStats.formatRate(SysStats.txRate); value: SysStats.txRate; font: metrics.font }
+      RollingText { text: SysStats.formatRate(SysStats.txShown); value: SysStats.txShown; font: metrics.font }
     }
   }
 

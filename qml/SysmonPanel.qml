@@ -4,7 +4,7 @@ import QtQuick
 import QtQuick.Layouts
 
 // cpu / ram / netSpeed pill module panel: the last minute as a graph, then the
-// busiest processes (cpu, ram) or interfaces (netSpeed), refreshed every second
+// busiest processes (cpu, ram) or interfaces (netSpeed), refreshed every 5s
 Item {
   id: panel
 
@@ -18,7 +18,7 @@ Item {
   Keys.onEscapePressed: panel.closeRequested()
   Component.onCompleted: {
     forceActiveFocus()
-    if (isNet) netRows.onInterfacesChanged()
+    if (isNet) netRows.onInterfacesShownChanged()
   }
 
   // fixed rows updated in place, so values and bars animate instead of rebuilding
@@ -39,8 +39,8 @@ Item {
     id: netRows
     target: SysStats
     enabled: panel.isNet
-    function onInterfacesChanged() {
-      panel.fill(SysStats.interfaces.slice(0, panel.rowCount).map(i => ({
+    function onInterfacesShownChanged() {
+      panel.fill(SysStats.interfacesShown.slice(0, panel.rowCount).map(i => ({
         name: i.name,
         value: i.rx + i.tx,
         text: "↓" + SysStats.formatRate(i.rx) + "  ↑" + SysStats.formatRate(i.tx)
@@ -48,7 +48,7 @@ Item {
     }
   }
 
-  // one long-lived top streams a frame every second while the panel is open
+  // one long-lived top streams a frame every 5s while the panel is open
   property var frame: []
   property bool inTable: false
 
@@ -59,7 +59,7 @@ Item {
 
   Process {
     running: !panel.isNet
-    command: ["top", "-b", "-d", String(SysStats.interval / 1000), "-w", "512", "-o", panel.kind === "ram" ? "RES" : "%CPU"]
+    command: ["top", "-b", "-d", String(SysStats.displayInterval / 1000), "-w", "512", "-o", panel.kind === "ram" ? "RES" : "%CPU"]
     // no toprc: a user's saved field layout would break the column parsing
     environment: ({ "HOME": "/nonexistent", "XDG_CONFIG_HOME": "/nonexistent" })
     stdout: SplitParser {
@@ -82,9 +82,9 @@ Item {
 
   readonly property string title: kind === "ram" ? "Memory" : isNet ? "Network" : "CPU"
   readonly property string headline: kind === "ram"
-    ? SysStats.formatKb(SysStats.memUsedKb) + " / " + SysStats.formatKb(SysStats.memTotalKb)
-    : isNet ? "↓" + SysStats.formatRate(SysStats.rxRate) + "  ↑" + SysStats.formatRate(SysStats.txRate)
-    : SysStats.formatPercent(SysStats.cpuPercent)
+    ? SysStats.formatKb(SysStats.memUsedShown) + " / " + SysStats.formatKb(SysStats.memTotalKb)
+    : isNet ? "↓" + SysStats.formatRate(SysStats.rxShown) + "  ↑" + SysStats.formatRate(SysStats.txShown)
+    : SysStats.formatPercent(SysStats.cpuShown)
 
   // short staggered rise on open
   property real reveal: 0
@@ -109,7 +109,7 @@ Item {
       Item { Layout.fillWidth: true }
       RollingText {
         text: panel.headline
-        value: panel.kind === "ram" ? SysStats.memUsedKb : panel.isNet ? SysStats.rxRate : SysStats.cpuPercent
+        value: panel.kind === "ram" ? SysStats.memUsedShown : panel.isNet ? SysStats.rxShown : SysStats.cpuShown
         color: Theme.fg3
         font { family: Theme.fontFamily; pixelSize: 13 }
       }
@@ -172,7 +172,7 @@ Item {
             visible: width >= radius * 2
             color: Theme.bg3
             // the visualizer's feel: OutQuad across the whole gap to the next frame
-            Behavior on width { NumberAnimation { duration: SysStats.interval; easing.type: Easing.OutQuad } }
+            Behavior on width { NumberAnimation { duration: SysStats.displayInterval; easing.type: Easing.OutQuad } }
           }
 
           Text {

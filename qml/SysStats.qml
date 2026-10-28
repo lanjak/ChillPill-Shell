@@ -9,7 +9,7 @@ import QtQuick
 Singleton {
   id: root
 
-  readonly property int interval: 1000
+  readonly property int interval: 2000
   // one minute of samples for the hover graph, plus two that sit past its
   // left edge, so the oldest point slides out instead of vanishing on screen
   readonly property int graphSlots: 60000 / interval
@@ -35,6 +35,24 @@ Singleton {
   property var txHistory: []
   // [{ name, rx, tx }] per-interface rates, busiest first
   property var interfaces: []
+
+  // numbers in the pill, tooltip and panel: the latest sample, refreshed only
+  // every displayInterval so they change less often than the graphs move
+  readonly property int displayInterval: 5000
+  property real cpuShown: 0
+  property real memUsedShown: 0
+  readonly property real memPercentShown: memTotalKb > 0 ? memUsedShown / memTotalKb * 100 : 0
+  property real rxShown: 0
+  property real txShown: 0
+  property var interfacesShown: []
+
+  function showLatest() {
+    cpuShown = cpuPercent
+    memUsedShown = memUsedKb
+    rxShown = rxRate
+    txShown = txRate
+    interfacesShown = interfaces
+  }
 
   function push(list, v) {
     const next = list.length >= historyLength ? list.slice(1 - historyLength) : list.slice()
@@ -152,5 +170,20 @@ Singleton {
       if (root.wantRam) memFile.reload()
       if (root.wantNet) netFile.reload()
     }
+  }
+
+  Timer {
+    id: displayTimer
+    interval: root.displayInterval
+    running: root.wantCpu || root.wantRam || root.wantNet
+    repeat: true
+    onTriggered: root.showLatest()
+  }
+
+  // first numbers as soon as the second sample gives a rate, not after 5s
+  Timer {
+    interval: root.interval + 100
+    running: displayTimer.running
+    onTriggered: root.showLatest()
   }
 }
