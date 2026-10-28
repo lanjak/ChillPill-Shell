@@ -83,6 +83,9 @@ Item {
         case "weather":       return { icon: String.fromCodePoint(0xe312),  color: Theme.weatherFg, text: "24°C", iconSize: 11 }
         case "audioVisualizer": return { icon: "",       spectrum: true, color: Theme.fg,     text: "" }
         case "tray":          return { icon: String.fromCodePoint(0xf1294), color: Theme.fg, text: "tray" }
+        case "cpu":           return { icon: String.fromCodePoint(0xf0ee0), color: Theme.fg, text: "12%" }
+        case "ram":           return { icon: String.fromCodePoint(0xf035b), color: Theme.fg, text: "38%" }
+        case "netSpeed":      return { icon: "", color: Theme.fg, text: "↓1.2M ↑40K" }
         default:              return { icon: String.fromCodePoint(0xf016),  color: Theme.fg4,    text: name }
         }
     }

@@ -167,7 +167,7 @@ ShellRoot {
       && ToplevelManager.activeToplevel.screens.some(s => s.name === screen.name)
     // overlay, so the pill shows over a fullscreen window that has lost focus
     WlrLayershell.layer: WlrLayershell.Overlay
-    WlrLayershell.keyboardFocus: (box.wifiPanelOpen || box.bluetoothPanelOpen || box.cliphistOpen || box.spotlight || box.wallpaperSwitcherOpen || box.themePicker || box.powerMenu ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None)
+    WlrLayershell.keyboardFocus: (box.wifiPanelOpen || box.bluetoothPanelOpen || box.cliphistOpen || box.spotlight || box.wallpaperSwitcherOpen || box.themePicker || box.powerMenu || box.sysmon !== "" ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None)
     implicitHeight: Math.max(885 * scale, calendarLoader.item && calendarLoader.item.visible
             ? calendarLoader.y + calendarLoader.item.height : 0)
     onScreenChanged: console.log("dpi:", screen.devicePixelRatio)
@@ -293,6 +293,7 @@ ShellRoot {
         || wallpaperSwitcherOpen
         || powerMenu
         || themePicker
+        || sysmon !== ""
         || mediaPopupShown
         || (notificationModule.active && !notifFullscreenMode)
         || (activeOsd !== "")
@@ -387,6 +388,18 @@ ShellRoot {
       property bool themePicker: false
       property string powerMenuInitialAction: ""
 
+      // cpu / ram / netSpeed module panel, the module name or ""
+      property string sysmon: ""
+      function openSysmon(kind) {
+        tooltipVisible = false
+        mediaAutoOpened = false
+        sysmon = kind
+      }
+      // any other pill state takes over from the panel
+      readonly property bool otherPanelOpen: controlCenter || miniDashboard || cliphistOpen || spotlight
+        || wallpaperSwitcherOpen || powerMenu || themePicker
+      onOtherPanelOpenChanged: if (otherPanelOpen) sysmon = ""
+
       // the state is unloaded on close, so it never gets to emit previewToggled(false)
       // on its way out; reset here or the pill keeps the full preview shape
       onCliphistOpenChanged: if (!cliphistOpen) cliphistPreviewing = false
@@ -477,6 +490,7 @@ ShellRoot {
                      : (cliphistOpen && cliphistPreviewing) ? 400
                      : wallpaperSwitcherOpen ? 600
                      : cliphistOpen ? 440
+                     : sysmon !== "" ? ccBaseWidth
                      : mediaPopupShown ? 335
                      : row.implicitWidth + (12 * Config.pillScale) + (Config.pillOnHover || !hovered ? 56 : 68) * Config.pillScale
 
@@ -497,6 +511,7 @@ ShellRoot {
                       ? (spotlightLoader.item ? spotlightLoader.item.height + 15 : 250)
                   : wallpaperSwitcherOpen ? 308
                   : cliphistOpen ? 276
+                  : sysmon !== "" ? 305
                   : mediaPopupShown ? 94
                   : (row.implicitHeight * Config.pillScale) + 10
 
@@ -514,6 +529,7 @@ ShellRoot {
         : wallpaperSwitcherOpen ? 30
         : activeOsd !== "" ? 20
         : powerMenu ? 22
+        : sysmon !== "" ? 25
         : mediaPopupShown ? 23
         : 20 * Config.pillScale
 
@@ -595,6 +611,11 @@ ShellRoot {
           // (theme cards handle their own click and apply + close)
           if (box.themePicker) {
             box.themePicker = false
+            return
+          }
+
+          if (box.sysmon !== "") {
+            box.sysmon = ""
             return
           }
 
@@ -1053,6 +1074,35 @@ ShellRoot {
           function onApplyRequested(name) { Theme.applyTheme(name); box.themePicker = false }
         }
       }
+      // cpu / ram / netSpeed panel, opens from its pill module
+      Item {
+        anchors.centerIn: parent
+        width: box.implicitWidth - 30
+        height: box.sysmon !== "" ? box.implicitHeight - 30 : 0
+        opacity: box.sysmon !== ""
+                 && !notificationModule.active
+                 && box.activeOsd === "" ? 1 : 0
+        visible: opacity > 0
+
+        Behavior on opacity {
+          SequentialAnimation {
+            PauseAnimation { duration: box.sysmon !== "" ? 15 : 0 }
+            NumberAnimation { duration: 150; easing.type: Easing.OutExpo }
+          }
+        }
+
+        // only exists while open, so its top process stops on close
+        Loader {
+          anchors.fill: parent
+          active: box.sysmon !== ""
+          asynchronous: true
+          sourceComponent: SysmonPanel {
+            kind: box.sysmon
+            onCloseRequested: box.sysmon = ""
+          }
+        }
+      }
+
       SystemClock {
         id: clock
         precision: SystemClock.Minutes

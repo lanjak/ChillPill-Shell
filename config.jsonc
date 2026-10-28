@@ -6,6 +6,7 @@
   "theme": "",
   "pillModules": ["battery", "volume", "workspaces", "network", "clock"],
   "pillOnHover": false,
+  "netSpeedUnit": "bytes",
   "pillMonitor": "all",
   "hidePillOnFullscreen": true,
   "textFontFamily": "Monocraft",

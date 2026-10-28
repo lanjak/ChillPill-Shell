@@ -103,7 +103,7 @@ into your session at all times. It's not bound to any dotfiles.
 ---
 - Main pill bar modules have tooltips
 
-- Extra modules available for the pill bar beyond the defaults: `weather`, `bluetooth`, `vpn`, `notifications`, `brightness`, `audioVisualizer`, `tray` (system tray icons)
+- Extra modules available for the pill bar beyond the defaults: `weather`, `bluetooth`, `vpn`, `notifications`, `brightness`, `audioVisualizer`, `tray` (system tray icons), `cpu`, `ram`, `netSpeed` (hover for the last minute as a graph, click for the busiest processes or interfaces; `netSpeedUnit` picks `bytes` or `bits`)
 
 - Pill bar supports custom modules (waybar-style) — run any command/script in the bar with `format`/`tooltip` templates, refresh intervals, streaming output and click actions (see [Custom pill modules](#custom-pill-modules)).
 

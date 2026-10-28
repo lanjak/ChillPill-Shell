@@ -14,6 +14,7 @@ Row {
            && box.activeOsd === ""
            && !box.wallpaperSwitcherOpen
            && !box.themePicker
+           && box.sysmon === ""
            && !box.spotlight ? 1 : 0
   visible: opacity > 0
 

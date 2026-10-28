@@ -19,8 +19,8 @@ PanelWindow {
   margins.top: box.tooltipY - screen.y + effectiveScale * 18
   margins.left: box.tooltipX - screen.x - implicitWidth / 2
 
-  implicitWidth: label.implicitWidth + 16 * effectiveScale
-  implicitHeight: label.implicitHeight + 10 * effectiveScale
+  implicitWidth: Math.max(label.implicitWidth, graph.visible ? graph.width : 0) + 16 * effectiveScale
+  implicitHeight: label.implicitHeight + (graph.visible ? graph.height + 6 * effectiveScale : 0) + 10 * effectiveScale
 
   function formatMinutes(seconds) {
     const mins = Math.round(seconds / 60)
@@ -124,6 +124,14 @@ PanelWindow {
         }
         return s
       }
+      case "cpu":
+        return "CPU " + Math.round(SysStats.cpuShown) + "% • last minute"
+      case "ram":
+        return "RAM " + SysStats.formatKb(SysStats.memUsedShown) + " / " + SysStats.formatKb(SysStats.memTotalKb)
+          + " • " + Math.round(SysStats.memPercentShown) + "%"
+      case "netSpeed":
+        return "↓ " + SysStats.formatRate(SysStats.rxShown) + "  ↑ " + SysStats.formatRate(SysStats.txShown)
+          + " • last minute"
       case "notifications": {
         const m = notificationModule
         if (!m || m.notifications.length === 0) return "No Notifications"
@@ -142,12 +150,29 @@ PanelWindow {
     opacity: box.tooltipVisible ? 1 : 0
     Behavior on opacity { NumberAnimation { duration: 100 } }
 
-    Text {
-      id: label
+    Column {
       anchors.centerIn: parent
-      text: tooltipWindow.content
-      color: Theme.fg
-      font { family: Theme.fontFamily; pixelSize: 10 * effectiveScale; }
+      spacing: 6 * effectiveScale
+
+      Text {
+        id: label
+        anchors.horizontalCenter: parent.horizontalCenter
+        text: tooltipWindow.content
+        color: Theme.fg
+        font { family: Theme.fontFamily; pixelSize: 10 * effectiveScale; }
+      }
+
+      // last minute of the cpu / ram / netSpeed module
+      SysGraph {
+        id: graph
+        readonly property string kind: box.tooltipModule
+        visible: tooltipWindow.visible && (kind === "cpu" || kind === "ram" || kind === "netSpeed")
+        width: 170 * effectiveScale
+        height: 40 * effectiveScale
+        values: !visible ? [] : kind === "ram" ? SysStats.memHistory : kind === "netSpeed" ? SysStats.rxHistory : SysStats.cpuHistory
+        values2: visible && kind === "netSpeed" ? SysStats.txHistory : []
+        maxValue: kind === "netSpeed" ? 0 : 100
+      }
     }
   }
 }

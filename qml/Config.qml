@@ -50,6 +50,8 @@ Singleton {
       property var pillModules: ["battery", "volume", "workspaces", "network", "clock"]
       property string customWallpaperScript: ""
       property bool pillOnHover: false
+      // netSpeed pill module: "bytes" (K = KiB/s) or "bits" (K = kbit/s)
+      property string netSpeedUnit: "bytes"
       // "all" puts a pill on every monitor, or a monitor name like "DP-1" for one pill
       property string pillMonitor: "all"
       property bool hidePillOnFullscreen: true
@@ -113,6 +115,7 @@ Singleton {
   readonly property alias pillModules: adapter.pillModules
   readonly property alias customWallpaperScript: adapter.customWallpaperScript
   readonly property alias pillOnHover: adapter.pillOnHover
+  readonly property alias netSpeedUnit: adapter.netSpeedUnit
   readonly property alias pillMonitor: adapter.pillMonitor
   readonly property alias hidePillOnFullscreen: adapter.hidePillOnFullscreen
   readonly property alias confirmPowerActions: adapter.confirmPowerActions
