@@ -10,8 +10,10 @@ Singleton {
   id: root
 
   readonly property int interval: 2000
-  // one minute of samples for the hover graph
-  readonly property int historyLength: 60000 / interval
+  // one minute of samples for the hover graph, plus two that sit past its
+  // left edge, so the oldest point slides out instead of vanishing on screen
+  readonly property int graphSlots: 60000 / interval
+  readonly property int historyLength: graphSlots + 2
 
   readonly property var modules: Config.pillModules || []
   readonly property bool wantCpu: modules.includes("cpu")

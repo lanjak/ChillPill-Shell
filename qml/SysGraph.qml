@@ -11,7 +11,7 @@ Canvas {
   property color color2: Theme.netFg
   // 0 scales to the biggest sample (network), percentages pass 100
   property real maxValue: 0
-  // SysStats.historyLength / .interval; literals so the tooltip does not build SysStats on its own
+  // SysStats.graphSlots / .interval; literals so the tooltip does not build SysStats on its own
   property int slots: 30
   property int sampleInterval: 2000
 
