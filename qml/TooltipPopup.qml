@@ -125,10 +125,10 @@ PanelWindow {
         return s
       }
       case "cpu":
-        return "CPU " + Math.round(SysStats.cpuPercent) + "% • last minute"
+        return "CPU " + SysStats.formatPercent(SysStats.cpuPercent) + " • last minute"
       case "ram":
         return "RAM " + SysStats.formatKb(SysStats.memUsedKb) + " / " + SysStats.formatKb(SysStats.memTotalKb)
-          + " • " + Math.round(SysStats.memPercent) + "%"
+          + " • " + SysStats.formatPercent(SysStats.memPercent)
       case "netSpeed":
         return "↓ " + SysStats.formatRate(SysStats.rxRate) + "  ↑ " + SysStats.formatRate(SysStats.txRate)
           + " • last minute"

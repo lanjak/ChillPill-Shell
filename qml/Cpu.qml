@@ -22,10 +22,11 @@ Item {
     }
 
     Text {
-      text: Math.round(root.value) + "%"
+      text: SysStats.formatPercent(root.value)
       color: Theme.fg
       // fixed width so the pill does not twitch as the number changes
       Layout.preferredWidth: metrics.width
+      horizontalAlignment: Text.AlignRight
       font: metrics.font
     }
   }

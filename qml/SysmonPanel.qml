@@ -74,7 +74,7 @@ Item {
         const res = panel.parseMem(f[5])
         panel.frame.push(panel.kind === "ram"
           ? { name: f.slice(11).join(" "), value: res, text: SysStats.formatKb(res) }
-          : { name: f.slice(11).join(" "), value: cpu, text: cpu.toFixed(1) + "%" })
+          : { name: f.slice(11).join(" "), value: cpu, text: SysStats.formatPercent(cpu, 1) })
         if (panel.frame.length === panel.rowCount) panel.fill(panel.frame)
       }
     }
@@ -84,7 +84,7 @@ Item {
   readonly property string headline: kind === "ram"
     ? SysStats.formatKb(SysStats.memUsedKb) + " / " + SysStats.formatKb(SysStats.memTotalKb)
     : isNet ? "↓" + SysStats.formatRate(SysStats.rxRate) + "  ↑" + SysStats.formatRate(SysStats.txRate)
-    : Math.round(SysStats.cpuPercent) + "%"
+    : SysStats.formatPercent(SysStats.cpuPercent)
 
   // short staggered rise on open
   property real reveal: 0

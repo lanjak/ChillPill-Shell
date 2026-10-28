@@ -53,10 +53,18 @@ Singleton {
     return String((i > 0 && v < 9.95 ? v.toFixed(1) : Math.round(v)) + units[i]).padStart(4)
   }
 
+  // memory size, padded to 5 characters ("1024M", "12.3G") so it keeps one width
   function formatKb(kb) {
-    if (kb >= 1048576) return (kb / 1048576).toFixed(1) + "G"
-    if (kb >= 1024) return Math.round(kb / 1024) + "M"
-    return Math.round(kb) + "K"
+    const s = kb >= 1048576 ? (kb / 1048576).toFixed(1) + "G"
+            : kb >= 1024 ? Math.round(kb / 1024) + "M"
+            : Math.round(kb) + "K"
+    return s.padStart(5)
+  }
+
+  // percentage padded to one width: "  5%" / "100%", or "  0.5%" / "100.0%" with decimals
+  function formatPercent(v, decimals) {
+    const d = decimals || 0
+    return (v.toFixed(d) + "%").padStart(d ? 6 : 4)
   }
 
   property var lastCpu: null
