@@ -21,6 +21,8 @@ Singleton {
   readonly property bool wantNet: modules.includes("netSpeed")
 
   property real cpuPercent: 0
+  // logical cores, to turn top's per-core %CPU into a share of the whole cpu
+  property int cpuCores: 1
   property var cpuHistory: []
 
   property real memTotalKb: 0
@@ -96,7 +98,9 @@ Singleton {
     path: "/proc/stat"
     onLoaded: {
       // cpu  user nice system idle iowait irq softirq steal
-      const f = text().split("\n", 1)[0].trim().split(/\s+/).slice(1, 9).map(Number)
+      const lines = text().split("\n")
+      root.cpuCores = Math.max(1, lines.filter(l => /^cpu\d/.test(l)).length)
+      const f = lines[0].trim().split(/\s+/).slice(1, 9).map(Number)
       const idle = f[3] + f[4]
       const total = f.reduce((a, b) => a + b, 0)
       if (root.lastCpu) {

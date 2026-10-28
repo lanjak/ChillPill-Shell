@@ -70,7 +70,8 @@ Item {
         // PID USER PR NI VIRT RES SHR S %CPU %MEM TIME+ COMMAND
         const f = line.trim().split(/\s+/)
         if (f.length < 12) return
-        const cpu = Number(f[8])
+        // top reports per core (100% = one core busy); show the share of the whole cpu
+        const cpu = Number(f[8]) / SysStats.cpuCores
         const res = panel.parseMem(f[5])
         panel.frame.push(panel.kind === "ram"
           ? { name: f.slice(11).join(" "), value: res, text: SysStats.formatKb(res) }
