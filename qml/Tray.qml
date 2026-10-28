@@ -11,6 +11,7 @@ RowLayout {
   property int iconSize: 14 * Config.pillScale
   spacing: 6 * Config.paddingScale
 
+
   Repeater {
     model: SystemTray.items
 
@@ -32,7 +33,18 @@ RowLayout {
           if (mouse.button === Qt.MiddleButton) {
             item.secondaryActivate()
           } else if (mouse.button === Qt.RightButton || item.onlyMenu) {
-            if (!item.hasMenu) return
+            if (!item.hasMenu) {
+              // XEmbed icons (Wine apps, through xembedsniproxy) have no menu,
+              // the app draws its own once asked over D-Bus
+              if (mouse.button === Qt.RightButton) {
+                // global position under the icon, so the menu opens below the pill
+                const p = trayIcon.mapToItem(null, 0, trayIcon.height)
+                const sc = trayIcon.QsWindow.window.screen
+                Quickshell.execDetached(["sh", "/usr/share/chillpill-shell/scripts/tray-context-menu.sh", item.id,
+                  String(Math.round(sc.x + p.x)), String(Math.round(sc.y + Config.pillTopMargin + p.y + 4))])
+              }
+              return
+            }
             const p = trayIcon.mapToItem(null, 0, trayIcon.height)
             item.display(trayIcon.QsWindow.window, p.x, p.y)
           } else {
