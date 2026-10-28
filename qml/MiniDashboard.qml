@@ -160,7 +160,7 @@ Item {
           anchors.centerIn: parent;
           text: ""
           color: lockHover.containsMouse ? buttonHoverBg : Theme.fg;
-          font.pixelSize: 8
+          font { family: Config.nerdFontFamily; pixelSize: 8 }
           Behavior on color { ColorAnimation { duration: buttonHoverSpeed } }
         }
 
@@ -184,7 +184,7 @@ Item {
           anchors.centerIn: parent;
           text: "󰤄"
           color: sleepHover.containsMouse ? buttonHoverBg : Theme.fg;
-          font.pixelSize: 9
+          font { family: Config.nerdFontFamily; pixelSize: 9 }
           Behavior on color { ColorAnimation { duration: buttonHoverSpeed } }
         }
 
@@ -225,7 +225,7 @@ Item {
           anchors.centerIn: parent;
           text: ""
           color: rebootHover.containsMouse ? buttonHoverBg : Theme.fg;
-          font.pixelSize: 9;
+          font { family: Config.nerdFontFamily; pixelSize: 9 }
           Behavior on color { ColorAnimation { duration: buttonHoverSpeed } }
         }
 
@@ -257,7 +257,7 @@ Item {
           anchors.centerIn: parent;
           text: "󰐥"
           color: shutdownHover.containsMouse ? buttonHoverBg : Theme.fg;
-          font.pixelSize: 12;
+          font { family: Config.nerdFontFamily; pixelSize: 12 }
           Behavior on color { ColorAnimation { duration: buttonHoverSpeed } }
         }
 

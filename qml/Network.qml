@@ -17,11 +17,13 @@ RowLayout {
 
   property var tetherDevice: Networking.devices.values.find(d => d.type === DeviceType.Wired && d.connected)
   readonly property bool tethered: tetherDevice !== undefined
+  // usb tethering shows up as a wired device named usb0 / enp0s20u1 etc.
+  readonly property bool usbTether: tethered && /^usb|u[0-9]/.test(tetherDevice.name)
 
   readonly property real signal: active ? active.signalStrength * 100 : 0
 
   readonly property string icon: {
-    if (root.tethered) return String.fromCodePoint(0xf287) // nf-fa-usb
+    if (root.tethered) return String.fromCodePoint(root.usbTether ? 0xf287 : 0xf0200) // nf-fa-usb / nf-md-ethernet
     if (!Networking.wifiEnabled) return String.fromCodePoint(0xf092d)
     if (!active) return String.fromCodePoint(0xf092d)
     let s = signal / 100
@@ -48,7 +50,7 @@ RowLayout {
 
   Text {
       text: {
-          if (root.tethered) return "USB"
+          if (root.tethered) return root.usbTether ? "USB" : "LAN"
           if (!Networking.wifiEnabled) return "off"
           if (!root.active) return "N/A"
           return root.active.name
