@@ -2,7 +2,8 @@ import Quickshell
 import Quickshell.Io
 import QtQuick
 
-Text {
+// changed digits roll, like the cpu / ram / netSpeed modules
+RollingText {
   id: clockText
 
   property string todayEvent: ""
@@ -32,12 +33,12 @@ Text {
   }
 
   text: Qt.formatDateTime(clock.date, Config.clockFormat)
+  value: clock.date.getTime() // time only moves forward, so digits roll up
   color: Theme.fg
 
   font {
     family: Theme.fontFamily
     weight: 500
     pixelSize: 10 * Config.pillScale
-    letterSpacing: -0.5
   }
 }

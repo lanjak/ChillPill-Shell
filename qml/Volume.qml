@@ -55,7 +55,8 @@ RowLayout {
   property string activePort: ""
   readonly property bool isHeadphone: activePort.indexOf("headphone") !== -1
                                      || activePort.indexOf("headset") !== -1
-  spacing: 4 * Config.paddingScale
+  spacing: 2 * Config.pillScale
+  layoutDirection: Qt.RightToLeft // icon after the text
   function checkPort() {
     if (!ready) return
     portCheck.command = ["bash", "-c",

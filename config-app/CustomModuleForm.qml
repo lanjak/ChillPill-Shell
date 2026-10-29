@@ -109,7 +109,7 @@ ColumnLayout {
                 label: "Format"
                 hint: "Bar text - placeholders: {text} {tooltip} {icon}"
                 fieldWidth: 240
-                placeholder: "{icon} {text}"
+                placeholder: "{text} {icon}"
                 value: cf.draft.format
                 onEdited: (v) => cf.field("format", v)
             }

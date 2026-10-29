@@ -5,6 +5,8 @@ import QtQuick.Layouts
 
 RowLayout {
     id: root
+    spacing: 2 * Config.pillScale
+    layoutDirection: Qt.RightToLeft // icon after the text
 
     signal brightnessUpdated()
 

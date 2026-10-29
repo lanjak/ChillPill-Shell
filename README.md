@@ -48,9 +48,9 @@ This fork lives at [git.lanjak.net/rufi/ChillPill-Shell](https://git.lanjak.net/
 **New pill modules**
 - `tray`: system tray icons (StatusNotifierItem). Left click activates an icon, middle click runs its secondary action, and right click opens its menu. Wine and other XEmbed icons (through `xembedsniproxy`) also open their menu on right click. Hover shows the icon's tooltip. The module hides itself when there are no icons.
 - `cpu`, `ram` and `netSpeed`: CPU use, memory use, and download and upload rates.
-  - Hover shows a graph of the last minute. Click opens a panel with a larger graph and the 7 busiest processes (cpu, ram) or network interfaces (netSpeed).
+  - Hover shows text: cpu shows its usage and its peak in the last minute, ram shows used and total memory, and netSpeed shows the peak download and upload rates in the last minute. Click opens a panel with a larger graph and the 7 busiest processes (cpu, ram) or network interfaces (netSpeed).
+  - cpu and ram show usage as a word: `LOW` (under 40%), `MED` (under 70%), `HOT` (under 90%) or `MAX`. Hover shows the number. Rates have leading zeros (`012K`). So the pill does not change size as the values change.
   - The graphs sample every 2s and scroll smoothly. The numbers update every 5s, and only the digits that change roll in.
-  - The numbers have a fixed width, so the pill does not change size as they change.
   - Process CPU use is a share of the whole CPU, not of one core.
   - `netSpeedUnit` selects `bytes` (K = KiB/s) or `bits` (K = kbit/s).
   - The modules read `/proc` only when they are in `pillModules`. The process list runs `top` only while the panel is open.
@@ -71,6 +71,9 @@ This fork lives at [git.lanjak.net/rufi/ChillPill-Shell](https://git.lanjak.net/
 - The settings module is gone. The mini dashboard has a settings button at the top right.
 - The network module shows "LAN" for Ethernet and "USB" only for USB tethering.
 - Quickshell starts in QApplication mode, which tray menus need.
+- Module icons show after their text, with a 2px gap. Custom modules default to `{text} {icon}`.
+- The clock rolls the digits that change, like the cpu, ram and netSpeed modules.
+- Bar text uses greyscale antialiasing. With subpixel antialiasing set on the desktop, some text showed coloured edges.
 
 **Fixes**
 - The power buttons in the mini dashboard showed empty boxes. They now use the Nerd Font.
@@ -288,7 +291,7 @@ Besides the built-in Quickshell modules (`battery`, `workspaces`, `network`, `cl
 |---|---|
 | `run` | Command to execute **(required)**. Just pass the script name if it's in `~/.config/chillpill-shell/modules`, else with leading `~` or absolute path |
 | `icon` | Optional nerdfont icon, referenced in `format`/`tooltip` as `{icon}` |
-| `format` | Text shown in the bar. Supports `{text}` / `{tooltip}` / `{icon}` placeholders. Default: `{icon} {text}` (or just `{text}` without an icon) |
+| `format` | Text shown in the bar. Supports `{text}` / `{tooltip}` / `{icon}` placeholders. Default: `{text} {icon}` (or just `{text}` without an icon) |
 | `tooltip` | Tooltip shown on hover. Supports `{text}` / `{tooltip}` / `{icon}` placeholders. Default: the output's tooltip |
 | `every` | Refresh every N seconds. Omit (or `0`) to run once at startup |
 | `stream` | Keep the process running and update the module on every stdout line (`true`) |

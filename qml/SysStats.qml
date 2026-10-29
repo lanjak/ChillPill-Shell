@@ -10,7 +10,7 @@ Singleton {
   id: root
 
   readonly property int interval: 2000
-  // one minute of samples for the hover graph, plus two that sit past its
+  // one minute of samples for the panel graph (and the hover peak), plus two that sit past its
   // left edge, so the oldest point slides out instead of vanishing on screen
   readonly property int graphSlots: 60000 / interval
   readonly property int historyLength: graphSlots + 2
@@ -62,8 +62,20 @@ Singleton {
     return next
   }
 
-  // short rate: " 12B" "340K" "1.2M", in bits or bytes (netSpeedUnit);
-  // padded to 4 characters so the text keeps one width as the value changes
+  // highest sample of the last minute (the history holds two extra older ones)
+  function peak(list) {
+    return Math.max(0, ...list.slice(-graphSlots))
+  }
+
+  // usage as one 3-letter word, so the pill keeps one width; same cut-offs
+  // as the cpu / ram icon colors (warn at 70, danger at 90)
+  function level(value) {
+    const percent = Math.round(value) // matches the rounded number in the tooltip
+    return percent >= 90 ? "MAX" : percent >= 70 ? "HOT" : percent >= 40 ? "MED" : "LOW"
+  }
+
+  // short rate: "012B" "340K" "1.2M", in bits or bytes (netSpeedUnit);
+  // zero-padded to 4 characters so the text keeps one width as the value changes
   function formatRate(bytesPerSec) {
     const bits = Config.netSpeedUnit === "bits"
     const step = bits ? 1000 : 1024
@@ -72,7 +84,7 @@ Singleton {
     let i = 0
     // roll over at 1000 so the text never grows past 4 characters
     while (v >= 999.5 && i < units.length - 1) { v /= step; i++ }
-    return String((i > 0 && v < 9.95 ? v.toFixed(1) : Math.round(v)) + units[i]).padStart(4)
+    return String((i > 0 && v < 9.95 ? v.toFixed(1) : Math.round(v)) + units[i]).padStart(4, "0")
   }
 
   // memory size, padded to 5 characters ("1024M", "12.3G") so it keeps one width

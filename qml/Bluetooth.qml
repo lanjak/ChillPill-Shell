@@ -5,7 +5,8 @@ import PillBackend
 
 RowLayout {
     id: root
-    spacing: 4 * Config.paddingScale
+    spacing: 2 * Config.pillScale
+    layoutDirection: Qt.RightToLeft // icon after the text
 
     property string iconFg: Theme.netFg
     property string disconIconFg: Theme.netFgOff

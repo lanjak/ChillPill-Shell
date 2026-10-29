@@ -32,7 +32,7 @@ Row {
       property string leaving: ""
 
       width: cellMetrics.advanceWidth
-      height: cellMetrics.height
+      height: Math.ceil(cellMetrics.height) // whole pixels, or a centered row sits half a pixel low
       clip: true
 
       Component.onCompleted: current = ch

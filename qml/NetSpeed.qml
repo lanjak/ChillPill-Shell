@@ -11,24 +11,26 @@ Item {
   RowLayout {
     id: row
     anchors.centerIn: parent
-    spacing: 5 * Config.pillScale
+    spacing: 2 * Config.pillScale
 
-    // fixed width (padded rates), changed digits roll
-    Row {
-      Text { text: "↓"; color: Theme.fg; font: metrics.font }
-      RollingText { text: SysStats.formatRate(SysStats.rxShown); value: SysStats.rxShown; font: metrics.font }
-    }
+    Rate { rate: SysStats.rxShown; arrow: "↓"; font: metrics.font }
+    Rate { rate: SysStats.txShown; arrow: "↑"; font: metrics.font; opacity: 0.6 }
+  }
 
-    Row {
-      opacity: 0.6
-      Text { text: "↑"; color: Theme.fg; font: metrics.font }
-      RollingText { text: SysStats.formatRate(SysStats.txShown); value: SysStats.txShown; font: metrics.font }
-    }
+  // changed digits roll
+  component Rate: Row {
+    id: group
+    property real rate: 0
+    property string arrow: ""
+    property font font
+    layoutDirection: Qt.RightToLeft // arrow after the rate
+    spacing: 2 * Config.pillScale
+    Text { text: group.arrow; color: Theme.fg; font: group.font }
+    RollingText { text: SysStats.formatRate(group.rate); value: group.rate; font: group.font }
   }
 
   TextMetrics {
     id: metrics
-    text: "↓999K"
     font { family: Theme.fontFamily; pixelSize: root.fontSize; weight: 500 }
   }
 

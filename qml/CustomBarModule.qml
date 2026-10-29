@@ -13,7 +13,7 @@ import QtQuick
 //    run       command to execute                                  required
 //    icon      static icon string, referenced as {icon} in format / tooltip
 //    format    bar text template - {text} / {tooltip} / {icon}
-//              default: {icon} {text} (or just {text} when no icon is set)
+//              default: {text} {icon} (or just {text} when no icon is set)
 //    tooltip   hover tooltip template - {text} / {tooltip} / {icon}
 //              default: the output's "tooltip" JSON field
 //    every     refresh interval in seconds (0 / omitted = run once at startup)
@@ -87,7 +87,7 @@ Item {
   function templateString() {
     if (spec.format !== undefined && spec.format !== null && String(spec.format) !== "")
       return String(spec.format)
-    return root.icon !== "" ? "{icon} {text}" : "{text}"
+    return root.icon !== "" ? "{text} {icon}" : "{text}"
   }
 
   // like computeLabel(), but wraps the {icon} glyph in a colored span so the

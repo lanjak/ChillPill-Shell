@@ -1,4 +1,5 @@
 //@ pragma UseQApplication
+//@ pragma Env QSG_DISTANCEFIELD_ANTIALIASING=gray
 import Quickshell
 import Quickshell.Io
 import Quickshell.Hyprland

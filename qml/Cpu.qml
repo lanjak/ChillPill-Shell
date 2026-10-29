@@ -12,7 +12,8 @@ Item {
   RowLayout {
     id: row
     anchors.centerIn: parent
-    spacing: 4 * Config.pillScale
+    spacing: 2 * Config.pillScale
+    layoutDirection: Qt.RightToLeft // icon after the text
 
     Text {
       text: String.fromCodePoint(0xf0ee0) // nf-md-cpu_64_bit
@@ -21,9 +22,9 @@ Item {
       Behavior on color { ColorAnimation { duration: 350; easing.type: Easing.OutQuad } }
     }
 
-    // fixed width (padded text), changed digits roll
+    // LOW / MED / HOT / MAX; changed letters roll
     RollingText {
-      text: SysStats.formatPercent(root.value)
+      text: SysStats.level(root.value)
       value: root.value
       font: metrics.font
     }
@@ -31,7 +32,7 @@ Item {
 
   TextMetrics {
     id: metrics
-    text: "100%"
+    text: "MAX"
     font { family: Theme.fontFamily; pixelSize: root.fontSize; weight: 500 }
   }
 
