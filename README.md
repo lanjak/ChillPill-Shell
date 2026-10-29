@@ -50,7 +50,7 @@ This fork lives at [git.lanjak.net/rufi/ChillPill-Shell](https://git.lanjak.net/
 - `cpu`, `ram` and `netSpeed`: CPU use, memory use, and download and upload rates.
   - Hover shows text: cpu shows its usage and its peak in the last minute, ram shows used and total memory, and netSpeed shows the peak download and upload rates in the last minute. Click opens a panel with a larger graph and the 7 busiest processes (cpu, ram) or network interfaces (netSpeed).
   - cpu and ram show usage as a word: `LOW` (under 40%), `MED` (under 70%), `HOT` (under 90%) or `MAX`. Hover shows the number. Rates have leading zeros (`012K`). So the pill does not change size as the values change.
-  - The graphs sample every 2s and scroll smoothly. The numbers update every 5s, and only the digits that change roll in.
+  - The panel graph samples every 2s and scrolls smoothly. The values in the pill update every 5s, and only the characters that change roll in.
   - Process CPU use is a share of the whole CPU, not of one core.
   - `netSpeedUnit` selects `bytes` (K = KiB/s) or `bits` (K = kbit/s).
   - The modules read `/proc` only when they are in `pillModules`. The process list runs `top` only while the panel is open.
