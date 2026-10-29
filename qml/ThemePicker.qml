@@ -369,7 +369,7 @@ Item {
           text: row.d.name || row.modelData
           color: row.selected || row.isActive ? Theme.fg : Theme.fg4
           elide: Text.ElideRight
-          font { family: Theme.fontFamily; pixelSize: 12; weight: row.isActive ? 700 : 400 }
+          font { family: Theme.fontFamily; pixelSize: 12; weight: row.isActive ? 500 : 400 }
           Behavior on color { ColorAnimation { duration: 120 } }
           Behavior on anchors.leftMargin { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
         }
