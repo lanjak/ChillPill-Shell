@@ -12,8 +12,7 @@ Item {
   RowLayout {
     id: row
     anchors.centerIn: parent
-    spacing: 2 * Config.pillScale
-    layoutDirection: Qt.RightToLeft // icon after the text
+    spacing: 4 * Config.pillScale
 
     Text {
       text: String.fromCodePoint(0xf0ee0) // nf-md-cpu_64_bit

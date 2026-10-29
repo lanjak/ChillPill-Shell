@@ -71,7 +71,6 @@ This fork lives at [git.lanjak.net/rufi/ChillPill-Shell](https://git.lanjak.net/
 - The settings module is gone. The mini dashboard has a settings button at the top right.
 - The network module shows "LAN" for Ethernet and "USB" only for USB tethering.
 - Quickshell starts in QApplication mode, which tray menus need.
-- Module icons show after their text, with a 2px gap. Custom modules default to `{text} {icon}`.
 - The clock rolls the digits that change, like the cpu, ram and netSpeed modules.
 - Bar text uses greyscale antialiasing. With subpixel antialiasing set on the desktop, some text showed coloured edges.
 
@@ -291,7 +290,7 @@ Besides the built-in Quickshell modules (`battery`, `workspaces`, `network`, `cl
 |---|---|
 | `run` | Command to execute **(required)**. Just pass the script name if it's in `~/.config/chillpill-shell/modules`, else with leading `~` or absolute path |
 | `icon` | Optional nerdfont icon, referenced in `format`/`tooltip` as `{icon}` |
-| `format` | Text shown in the bar. Supports `{text}` / `{tooltip}` / `{icon}` placeholders. Default: `{text} {icon}` (or just `{text}` without an icon) |
+| `format` | Text shown in the bar. Supports `{text}` / `{tooltip}` / `{icon}` placeholders. Default: `{icon} {text}` (or just `{text}` without an icon) |
 | `tooltip` | Tooltip shown on hover. Supports `{text}` / `{tooltip}` / `{icon}` placeholders. Default: the output's tooltip |
 | `every` | Refresh every N seconds. Omit (or `0`) to run once at startup |
 | `stream` | Keep the process running and update the module on every stdout line (`true`) |

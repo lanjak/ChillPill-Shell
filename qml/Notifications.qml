@@ -3,8 +3,6 @@ import QtQuick.Layouts
 
 RowLayout {
   Layout.alignment: Qt.AlignVCenter
-  spacing: 2 * Config.pillScale
-  layoutDirection: Qt.RightToLeft // icon after the text
 
   Text {
     text: "\uf0f3"

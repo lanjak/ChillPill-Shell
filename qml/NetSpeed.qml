@@ -11,7 +11,7 @@ Item {
   RowLayout {
     id: row
     anchors.centerIn: parent
-    spacing: 2 * Config.pillScale
+    spacing: 5 * Config.pillScale
 
     Rate { rate: SysStats.rxShown; arrow: "↓"; font: metrics.font }
     Rate { rate: SysStats.txShown; arrow: "↑"; font: metrics.font; opacity: 0.6 }
@@ -23,8 +23,6 @@ Item {
     property real rate: 0
     property string arrow: ""
     property font font
-    layoutDirection: Qt.RightToLeft // arrow after the rate
-    spacing: 2 * Config.pillScale
     Text { text: group.arrow; color: Theme.fg; font: group.font }
     RollingText { text: SysStats.formatRate(group.rate); value: group.rate; font: group.font }
   }

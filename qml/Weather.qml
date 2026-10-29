@@ -13,8 +13,7 @@ Item {
   Row {
     id: row
     anchors.centerIn: parent
-    spacing: 2 * Config.pillScale
-    layoutDirection: Qt.RightToLeft // icon after the text
+    spacing: 5
 
     Text {
       text: WeatherModule.iconGlyph

@@ -8,8 +8,7 @@ RowLayout {
   property var battery: box.battery
   property bool charging: box.charging
   property bool hasBattery: box.hasBattery
-  spacing: 2 * Config.pillScale
-  layoutDirection: Qt.RightToLeft // icon after the text
+  spacing: 4 * Config.paddingScale
 
   // icon: battery on laptops, plug on desktops
   Text {
