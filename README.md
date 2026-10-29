@@ -43,7 +43,7 @@ into your session at all times. It's not bound to any dotfiles.
 
 ## Changes in this fork (lanjak)
 
-This fork lives at [git.lanjak.net/rufi/ChillPill-Shell](https://git.lanjak.net/rufi/ChillPill-Shell) and tracks [upstream](https://github.com/LUCKYS1NGHH/ChillPill-Shell). It adds these changes on top of upstream:
+This fork lives at [github.com/lanjak/ChillPill-Shell](https://github.com/lanjak/ChillPill-Shell) and tracks [upstream](https://github.com/LUCKYS1NGHH/ChillPill-Shell). It adds these changes on top of upstream:
 
 **New pill modules**
 - `tray`: system tray icons (StatusNotifierItem). Left click activates an icon, middle click runs its secondary action, and right click opens its menu. Wine and other XEmbed icons (through `xembedsniproxy`) also open their menu on right click. Hover shows the icon's tooltip. The module hides itself when there are no icons.
