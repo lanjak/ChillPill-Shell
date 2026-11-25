@@ -10,7 +10,6 @@ license=('GPL-3.0-only')
 depends=(
        'cliphist'
        'nusgmon-git'
-       'inotify-tools'
        'brightnessctl'
        'wl-clipboard'
        'quickshell'

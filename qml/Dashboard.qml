@@ -535,6 +535,29 @@ Item {
             }
           }
         }
+
+        // opens the config app
+        Rectangle {
+          anchors.top: parent.top
+          anchors.right: parent.right
+          implicitWidth: 20; implicitHeight: 20; radius: 9
+          color: settingsArea.containsMouse ? Theme.bg3 : Theme.bg
+          Text {
+            anchors.centerIn: parent
+            text: String.fromCodePoint(0xf0493) // nf-md-cog
+            color: Theme.fg4
+            font { family: Theme.nerdFontFamily; pixelSize: 11 }
+          }
+          scale: settingsArea.pressed ? 0.92 : (settingsArea.containsMouse ? 1.03 : 1)
+          Behavior on scale { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
+          MouseArea {
+            id: settingsArea
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: { box.dashboard = false; Quickshell.execDetached(["chillpill-config"]) }
+          }
+        }
       }
 
       // ----- calendar: square cells -----
