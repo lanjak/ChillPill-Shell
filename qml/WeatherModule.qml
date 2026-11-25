@@ -62,10 +62,13 @@ Singleton {
 
   function refresh() {
     root.loading = true
-    const url = "https://wttr.in/" + encodeURIComponent(Config.weatherLocation) + "?format=j1"
+    const location = Config.weatherLocation
+    const url = "https://wttr.in/" + encodeURIComponent(location) + "?format=j1"
     const xhr = new XMLHttpRequest()
     xhr.onreadystatechange = () => {
       if (xhr.readyState !== XMLHttpRequest.DONE) return
+      // a reply for a location the user already changed away from is stale
+      if (location !== Config.weatherLocation) return
       root.loading = false
       if (xhr.status !== 200) {
         root.errorMessage = "Weather fetch failed."
@@ -122,5 +125,11 @@ Singleton {
     repeat: true
     triggeredOnStart: true
     onTriggered: root.refresh()
+  }
+
+  // a new location must not wait for the next timer tick (up to an hour)
+  Connections {
+    target: Config
+    function onWeatherLocationChanged() { root.refresh() }
   }
 }
