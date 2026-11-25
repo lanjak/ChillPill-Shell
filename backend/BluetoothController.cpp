@@ -77,6 +77,7 @@ void BluetoothController::setScanning(bool on) {
     if (m_scanning == on) return;
     m_scanning = on;
     emit scanningChanged();
+    setBusy(on || m_busy);
 }
 
 void BluetoothController::setBusy(bool on) {
@@ -375,6 +376,17 @@ void BluetoothController::refreshDevices(bool discover) {
                 setErrorMessage(reply.error().message());
         } else {
             setScanning(true);
+            setBusy(true);
+            
+            QTimer::singleShot(5000, this, [this]() {
+                setScanning(false);
+                setBusy(false);
+                if (!m_adapterPath.isEmpty() && m_adapterPowered) {
+                    QDBusMessage stopCall = QDBusMessage::createMethodCall(kBluezService, m_adapterPath,
+                                                                             kAdapterIface, "StopDiscovery");
+                    QDBusConnection::systemBus().asyncCall(stopCall);
+                }
+            });
         }
     });
 }

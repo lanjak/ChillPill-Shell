@@ -6,7 +6,7 @@ import ".."
 Page {
     Heading { text: "PILL MODULES" }
     ModulesEditor {
-        known: ["battery", "volume", "workspaces", "network", "clock", "brightness", "vpn", "notifications", "bluetooth", "weather", "audioVisualizer", "tray", "cpu", "ram", "netSpeed"]
+        known: ["battery", "volume", "workspaces", "network", "clock", "brightness", "vpn", "notifications", "bluetooth", "weather", "audioVisualizer", "mic", "tray", "cpu", "ram", "netSpeed"]
         value: ConfigStore.cfg.pillModules === undefined ? [] : ConfigStore.cfg.pillModules
         onEdited: (v) => ConfigStore.set("pillModules", v)
       }

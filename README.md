@@ -26,16 +26,16 @@ into your session at all times. It's not bound to any dotfiles.
 
 <div align="center">
 
-[![Resource Usage](https://img.shields.io/badge/Resource%20Usage-404040?style=flat-square)](#resource-usage)
-[![Showcase](https://img.shields.io/badge/Showcase-424242?style=flat-square)](#showcase)
-[![Features](https://img.shields.io/badge/Features-404040?style=flat-square)](#features-pill-states)
-[![Configuration](https://img.shields.io/badge/Configuration%20App-424242?style=flat-square)](#configuration-app)
-[![Extras](https://img.shields.io/badge/Extras-404040?style=flat-square)](#lockscreen-optional)
-[![Dependencies](https://img.shields.io/badge/Dependencies-424242?style=flat-square)](#dependencies)
-[![Installation](https://img.shields.io/badge/Installation-404040?style=flat-square)](#install)
-[![Auto Startup](https://img.shields.io/badge/Auto%20Startup-424242?style=flat-square)](#auto-startup)
-[![Key Bindings](https://img.shields.io/badge/Key%20Bindings-404040?style=flat-square)](#key-bindings)
-[![Acknowledgements](https://img.shields.io/badge/Acknowledgements-424242?style=flat-square)](#co-cookers)
+[![Resource Usage](https://img.shields.io/badge/Resource%20Usage-383838?style=flat-square)](#resource-usage)
+[![Showcase](https://img.shields.io/badge/Showcase-414141?style=flat-square)](#showcase)
+[![Features](https://img.shields.io/badge/Features-383838?style=flat-square)](#features-pill-states)
+[![Configuration](https://img.shields.io/badge/Configuration%20App-414141?style=flat-square)](#configuration-app)
+[![Extras](https://img.shields.io/badge/Extras-383838?style=flat-square)](#lockscreen-default)
+[![Dependencies](https://img.shields.io/badge/Dependencies-414141?style=flat-square)](#dependencies)
+[![Installation](https://img.shields.io/badge/Installation-383838?style=flat-square)](#install)
+[![Auto Startup](https://img.shields.io/badge/Auto%20Startup-414141?style=flat-square)](#auto-startup)
+[![Key Bindings](https://img.shields.io/badge/Key%20Bindings-383838?style=flat-square)](#key-bindings)
+[![Acknowledgements](https://img.shields.io/badge/Acknowledgements-414141?style=flat-square)](#co-cookers)
 
 </div>
 
@@ -112,23 +112,27 @@ cd packaging/arch && makepkg -si
 
 <div align="center">
 
-<strong>Pill bar · Control Center</strong><br>
-<img src="screenshots/pillBar.webp" width="49%" alt="Pill bar">
+<img src="screenshots/pillBar.webp" alt="Pill bar"><br>
+<strong>macOS like notch bar style (config option)</strong>
+<img src="screenshots/notchBar.webp" alt="Notch bar">
+
+<strong>Control Center · Dashboard</strong><br>
 <img src="screenshots/controlCenter.webp" width="49%" alt="Control Center">
+<img src="screenshots/dashboard.webp" width="49%" alt="Dashboard">
 
-<strong>Clipboard manager · Full preview</strong><br>
+<strong>Clipboard manager · Clipboard full preview (image)</strong><br>
 <img src="screenshots/clipboardManager.webp" width="49%" alt="Clipboard manager (cliphist)">
-<img src="screenshots/clipboardImageFullPreview.webp" width="49%" alt="Clipboard item full preview">
+<img src="screenshots/clipboardImageFullPreview.webp" width="49%" alt="Clipboard image full preview">
 
-<strong>Mini dashboard · Weather & Calendar</strong><br>
-<img src="screenshots/miniDashboard-weather.webp" width="49%" alt="Mini dashboard weather">
-<img src="screenshots/miniDashboard-calendar.webp" width="49%" alt="Mini dashboard calendar">
+<strong>Clipboard full preview (text) · Theme Picker</strong><br>
+<img src="screenshots/clipboardTextFullPreview.webp" width="49%" alt="Clipboard text full preview">
+<img src="screenshots/themePicker.webp" width="49%" alt="Theme Picker">
 
 <strong>Wi-Fi · Bluetooth states</strong><br>
 <img src="screenshots/wifiState.webp" width="49%" alt="Wi-Fi state">
 <img src="screenshots/bluetoothState.webp" width="49%" alt="Bluetooth state">
 
-<strong>Media Popup · Spotlight</strong><br>
+<strong>Spotlight · Media Popup</strong><br>
 <img src="screenshots/spotlight.webp" width="49%" alt="Spotlight">
 <img src="screenshots/mediaPopup.webp" width="49%" alt="Media popup">
 
@@ -140,14 +144,12 @@ cd packaging/arch && makepkg -si
 
 ## Features (Pill States)
 
-- **Main pill bar**                  - Battery, volume, workspaces, network, clock (default; fully customizable in the config app) — for more module options, see 'Know more' below.
+- **Main pill bar**                  - Battery, volume, workspaces, network, clock (default; fully customizable in the config app) — for more module options, see 'Know more' below, including system tray modules.
 - **Control center**                 - Media player, buttons (WiFi, Silent Notifs, Timer, Bluetooth), volume & brightness sliders, notification stack
-  - **Wifi state**
-  - **Bluetooth state**
-- **Cliphist (clipboard manager)**   - Search (optional fuzzy search), clipboard image preview, item index status, multi select to delete many items at once (<kbd>Shift</kbd> + <kbd>Up</kbd>/<kbd>Down</kbd> range, <kbd>Shift</kbd> + <kbd>Space</kbd> pick, <kbd>Del</kbd> to delete), <kbd>Tab</kbd> to full preview the clipboard image/text
-- **Mini dashboard**                 - Profile image, username, hostname, uptime, battery, basic network info, today's data usage, datetime, weather, calendar, power buttons (lock, sleep, shutdown, reboot)
-  - **Calendar popup**              - Previous/Next month buttons, event dates
-  - **Weather popup**               - Feel, humidity, wind, sunrise & sunset, upcoming 2 days weather forecast, manual refresh button
+  - **Wifi state**                   - List of available networks, hero card, password prompt, forget prompt, USB tethering, network info (band, signal strength and security), refresh networks button etc.
+  - **Bluetooth state**              - List of available devices, hero card, tips in footer, refresh devices button etc.
+- **Cliphist (clipboard manager)**   - Search (optional fuzzy search), clipboard image preview, item index status, multi select to delete many items at once (<kbd>Shift</kbd> + <kbd>Up</kbd>/<kbd>Down</kbd> range, <kbd>Shift</kbd> + <kbd>Space</kbd> pick, <kbd>Del</kbd> to delete), <kbd>Tab</kbd> to full preview the clipboard image/text, <kbd>Shift</kbd> + <kbd>Up</kbd>/<kbd>Down</kbd> to scroll multi lines clipboard text in full preview
+- **Dashboard**                      - Profile image, username, hostname, uptime, battery tile, network tile, calendar tile, weather tile, disk tile.
 - **Spotlight**                      - List of applications (<kbd>Tab</kbd> to read the long app description), optional fuzzy search for apps, web search (<kbd>Tab</kbd> to expand the full search url), math and shell commands run
 - **DBus notification**              - App icon (optional), summary, body (YES! you can ditch swaync/dunst fully now)
 - **OSD**                            - Battery, volume, brightness, timer
@@ -161,7 +163,7 @@ cd packaging/arch && makepkg -si
 ---
 - Main pill bar modules have tooltips
 
-- Extra modules available for the pill bar beyond the defaults: `weather`, `bluetooth`, `vpn`, `notifications`, `brightness`, `audioVisualizer`, `tray` (system tray icons), `cpu`, `ram`, `netSpeed` (hover for the last minute as a graph, click for the busiest processes or interfaces; `netSpeedUnit` picks `bytes` or `bits`)
+- Extra modules available for the pill bar beyond the defaults: `weather`, `bluetooth`, `vpn`, `notifications`, `brightness`, `audioVisualizer`, `mic`, `tray` (system tray icons), `cpu`, `ram`, `netSpeed` (hover for the last minute as a graph, click for the busiest processes or interfaces; `netSpeedUnit` picks `bytes` or `bits`)
 
 - Pill bar supports custom modules (waybar-style) — run any command/script in the bar with `format`/`tooltip` templates, refresh intervals, streaming output and click actions (see [Custom pill modules](#custom-pill-modules)).
 
@@ -169,7 +171,7 @@ cd packaging/arch && makepkg -si
 
   - Control center: <kbd>Left click</kbd>
   - Cliphist: <kbd>Middle click</kbd>
-  - Mini Dashboard: <kbd>Right click</kbd>
+  - Dashboard: <kbd>Right click</kbd>
 
   For the rest of states, you have to call the IPC through keybinds in Hyprland, which are provided in [Keybinds](#key-bindings)
   section (including the mouse open-able states)
@@ -198,6 +200,9 @@ cd packaging/arch && makepkg -si
   you want this image cache to auto delete when you delete the cliphist (clipboard manager) image item, there's the `deleteCliphistImgCache` config
   option (enabled by default).
 
+- Cliphist image full preview tab supports image drag and drop, drop the image anywhere you want, or just drop it on your desktop screen to
+  apply the image as wallpaper.
+
 - In Cliphist full preview tab (which opens through <kbd>Tab</kbd> key), you can switch to other item by <kbd>Up</kbd>/<kbd>Down</kbd> keys,
   and can also delete the item from there. Full preview tab also shows previous/next item type (Image / Text) badges in bottom area,
   only if you toggle off the `separatePreviewTabTypes` (enabled by default).
@@ -213,7 +218,7 @@ cd packaging/arch && makepkg -si
 - Notifications, brightness and volume are able to show in slide animation (similar to iOS mute) while you are playing a video game or watching a movie
   in full screen.
 
-- Your today's data usage in mini dashboard is shown by [nusgmon](https://github.com/LUCKYS1NGHH/nusgmon) (i am the creator of it too).
+- Your today's data usage in Dashboard is shown by [nusgmon](https://github.com/LUCKYS1NGHH/nusgmon) (i am the creator of it too).
 
 - Wallpaper switcher shows you the filename of the image on hover, and uses `awww` in the backend to update the wallpaper by default (optional dep).
 ---
@@ -227,7 +232,7 @@ top filters every visible setting across them.
 
 <img src="screenshots/configApp.webp" width="100%" alt="GUI Config App for ChillPill-Shell">
 
-## Lockscreen (Optional)
+## Lockscreen (Default)
 > Default lockscreen app - authenticates through PAM's `login` service and uses the
 > Wayland session-lock protocol, so it is safe on Wayland compositors (Hyprland, Sway, river etc.)
 
@@ -323,14 +328,13 @@ Use your custom scripts to see specific/niche info in ChillPill-Shell's Pill Bar
 |---|---|
 | [Quickshell](https://quickshell.org/) | The whole shell - bar, states, config app |
 | [cliphist](https://github.com/sentriz/cliphist) | Pill bar · Cliphist (clipboard manager) state |
-| [nusgmon](https://github.com/LUCKYS1NGHH/nusgmon) | Mini dashboard · today's data usage |
+| [nusgmon](https://github.com/LUCKYS1NGHH/nusgmon) | Dashboard · today's data usage |
 | [brightnessctl](https://github.com/Hummer12007/brightnessctl) | Brightness module, slider and OSD |
 | [wl-clipboard](https://github.com/bugaevc/wl-clipboard) | Wayland clipboard I/O |
-| [inotify-tools](https://github.com/inotify-tools/inotify-tools) | File watchers (wallpaper switch, notification sounds) |
 | [pipewire](https://github.com/PipeWire/pipewire) | Audio server (volume, media player, visualizer) |
 | [blueman](https://github.com/blueman-project/blueman) | Bluetooth manager state |
 | Qt Multimedia (`qt6-multimedia`) | For notification popup sound |
-| [python-psutil](https://github.com/giampaolo/psutil) | Data usage in the mini dashboard |
+| [python-psutil](https://github.com/giampaolo/psutil) | Data usage in the Dashboard |
 
 ---
 </details>
@@ -462,7 +466,7 @@ Keybindings are highly recommended for ChillPill-Shell in your Hyprland config. 
 |---|---|---|
 | `controlCenter` | `MOD + CTRL + C` | Media, sliders, buttons, notifications |
 | `cliphist` | `MOD + CTRL + V` | Clipboard history |
-| `miniDashboard` | `MOD + CTRL + B` | Profile, weather, data usage, calendar etc. |
+| `dashboard` | `MOD + CTRL + B` | Profile, weather, data usage, calendar etc. |
 | `spotlight` | `MOD + D` | Apps list to open, web search, math and basic shell run |
 | `wallpaperSwitcher` | `MOD + W` | Wallpaper switcher |
 | `powerMenu` | `MOD + Escape` | Power menu actions |
@@ -487,7 +491,7 @@ qs ipc -p /usr/share/chillpill-shell call <target> <toggle|show|hide>
 Thanks to the Co-cookers (contributors) who helped make the shell better and are continuing it, and special thanks to [enhaoswen](https://github.com/enhaoswen) for the Wi-Fi controller backend for Quickshell.
 
 <a href="https://github.com/LUCKYS1NGHH/chillpill-shell/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=LUCKYS1NGHH/chillpill-shell" width="220" />
+  <img src="https://contrib.rocks/image?repo=LUCKYS1NGHH/chillpill-shell" width="400" />
 </a>
 
 ### Cooked by

@@ -26,12 +26,15 @@ Singleton {
       property int notificationDisplayTime: 3000
       property int maxNotificationsInStack: 20
       property int dataUsageRefreshInterval: 300000
+      property string dataUsageDefaultRange: "thisweek"
       property string screenLockAppCommand: "hyprlock"
       property int osdDuration: 800
       property string weatherUnits: "metric"
       property string weatherLocation: "Delhi"
       property int weatherRefreshInterval: 3600000
       property bool avoidDuplicateNotifications: true
+      // sender app name line in the notification popups (pill + fullscreen)
+      property bool showNotifAppName: true
       property string defaultTerminal: "kitty"
       property real pillScale: 1.0
       property real dpiScale: 1.0
@@ -47,6 +50,7 @@ Singleton {
       property bool showAudioVisuals: true
       property bool showSensitiveInfo: true
       property bool showShadows: true
+      property bool internetSpeedTestInDashboard: false
       property var pillModules: ["battery", "volume", "workspaces", "network", "clock"]
       property string customWallpaperScript: ""
       property bool pillOnHover: false
@@ -59,11 +63,17 @@ Singleton {
       property bool networkIconOnly: false
       // icons use the text colour instead of their own colours
       property bool monochromeIcons: false
+      // macOS notch: pill bar flush to the top screen edge with smooth round corners
+      property bool pillNotch: false
       property bool confirmPowerActions: true
       // suspend/restart/shutdown buttons on the lockscreen card
       property bool lockscreenPowerActions: true
       // media player strip on the lockscreen card (hidden when nothing plays)
       property bool lockscreenMedia: true
+      // dim the backlight after N idle seconds on the lockscreen (0 = off)
+      property int lockscreenIdleDim: 3
+      // idle dim target as a percent of the current backlight level
+      property int lockscreenIdleDimTo: 25
       property int maxVolume: 100
       property bool separatePreviewTabTypes: true
       property bool appLauncherFuzzySearch: false
@@ -95,12 +105,14 @@ Singleton {
   readonly property alias notificationDisplayTime: adapter.notificationDisplayTime
   readonly property alias maxNotificationsInStack: adapter.maxNotificationsInStack
   readonly property alias dataUsageRefreshInterval: adapter.dataUsageRefreshInterval
+  readonly property alias dataUsageDefaultRange: adapter.dataUsageDefaultRange
   readonly property alias screenLockAppCommand: adapter.screenLockAppCommand
   readonly property alias osdDuration: adapter.osdDuration
   readonly property alias weatherUnits: adapter.weatherUnits
   readonly property alias weatherLocation: adapter.weatherLocation
   readonly property alias weatherRefreshInterval: adapter.weatherRefreshInterval
   readonly property alias avoidDuplicateNotifications: adapter.avoidDuplicateNotifications
+  readonly property alias showNotifAppName: adapter.showNotifAppName
   readonly property alias defaultTerminal: adapter.defaultTerminal
   readonly property alias pillScale: adapter.pillScale
   readonly property alias dpiScale: adapter.dpiScale
@@ -116,6 +128,7 @@ Singleton {
   readonly property alias showAudioVisuals: adapter.showAudioVisuals
   readonly property alias showSensitiveInfo: adapter.showSensitiveInfo
   readonly property alias showShadows: adapter.showShadows
+  readonly property alias internetSpeedTestInDashboard: adapter.internetSpeedTestInDashboard
   readonly property alias pillModules: adapter.pillModules
   readonly property alias customWallpaperScript: adapter.customWallpaperScript
   readonly property alias pillOnHover: adapter.pillOnHover
@@ -124,9 +137,12 @@ Singleton {
   readonly property alias hidePillOnFullscreen: adapter.hidePillOnFullscreen
   readonly property alias networkIconOnly: adapter.networkIconOnly
   readonly property alias monochromeIcons: adapter.monochromeIcons
+  readonly property alias pillNotch: adapter.pillNotch
   readonly property alias confirmPowerActions: adapter.confirmPowerActions
   readonly property alias lockscreenPowerActions: adapter.lockscreenPowerActions
   readonly property alias lockscreenMedia: adapter.lockscreenMedia
+  readonly property alias lockscreenIdleDim: adapter.lockscreenIdleDim
+  readonly property alias lockscreenIdleDimTo: adapter.lockscreenIdleDimTo
   readonly property alias maxVolume: adapter.maxVolume
   readonly property alias separatePreviewTabTypes: adapter.separatePreviewTabTypes
   readonly property alias appLauncherFuzzySearch: adapter.appLauncherFuzzySearch

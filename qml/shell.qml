@@ -8,6 +8,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Effects
+import QtQuick.Shapes
 import Quickshell.Widgets
 import Quickshell.Services.UPower
 import Quickshell.Services.Notifications
@@ -17,80 +18,80 @@ ShellRoot {
 
   IpcHandler {
       target: "cliphist"
-      function toggle(): void { focusedBox.controlCenter = false; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = !focusedBox.cliphistOpen; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.themePicker = false }
-      function show(): void { focusedBox.controlCenter = false; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = true; focusedBox.powerMenu = false; }
+      function toggle(): void { focusedBox.controlCenter = false; focusedBox.dashboard = false; focusedBox.cliphistOpen = !focusedBox.cliphistOpen; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.themePicker = false }
+      function show(): void { focusedBox.controlCenter = false; focusedBox.dashboard = false; focusedBox.cliphistOpen = true; focusedBox.powerMenu = false; }
       function hide(): void { focusedBox.cliphistOpen = false }
   }
 
   IpcHandler {
       target: "controlCenter"
-      function toggle(): void { focusedBox.controlCenter = !focusedBox.controlCenter; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.themePicker = false }
-      function show(): void { focusedBox.controlCenter = true; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.powerMenu = false; }
+      function toggle(): void { focusedBox.controlCenter = !focusedBox.controlCenter; focusedBox.dashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.themePicker = false }
+      function show(): void { focusedBox.controlCenter = true; focusedBox.dashboard = false; focusedBox.cliphistOpen = false; focusedBox.powerMenu = false; }
       function hide(): void { focusedBox.controlCenter = false }
   }
 
   IpcHandler {
-      target: "miniDashboard"
-      function toggle(): void { focusedBox.controlCenter = false; focusedBox.miniDashboard = !focusedBox.miniDashboard; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.themePicker = false }
-      function show(): void { focusedBox.controlCenter = false; focusedBox.miniDashboard = true; focusedBox.cliphistOpen = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; }
-      function hide(): void { focusedBox.miniDashboard = false }
+      target: "dashboard"
+      function toggle(): void { focusedBox.controlCenter = false; focusedBox.dashboard = !focusedBox.dashboard; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.themePicker = false }
+      function show(): void { focusedBox.controlCenter = false; focusedBox.dashboard = true; focusedBox.cliphistOpen = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; }
+      function hide(): void { focusedBox.dashboard = false }
   }
 
   // alias for spotlight
   IpcHandler {
     target: "appLauncher"
-    function toggle(): void { focusedBox.controlCenter = false; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = !focusedBox.spotlight; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.themePicker = false }
-    function show(): void { focusedBox.controlCenter = false; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = true; focusedBox.powerMenu = false; }
+    function toggle(): void { focusedBox.controlCenter = false; focusedBox.dashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = !focusedBox.spotlight; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.themePicker = false }
+    function show(): void { focusedBox.controlCenter = false; focusedBox.dashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = true; focusedBox.powerMenu = false; }
     function hide(): void { focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false }
   }
 
   IpcHandler {
     target: "theme"
-    function toggle(): void { focusedBox.themePicker = !focusedBox.themePicker; focusedBox.controlCenter = false; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false }
-    function show(): void { focusedBox.themePicker = true; focusedBox.controlCenter = false; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false }
+    function toggle(): void { focusedBox.themePicker = !focusedBox.themePicker; focusedBox.controlCenter = false; focusedBox.dashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false }
+    function show(): void { focusedBox.themePicker = true; focusedBox.controlCenter = false; focusedBox.dashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false }
     function hide(): void { focusedBox.themePicker = false }
     function apply(name: string): void { Theme.applyTheme(name) }
   }
 
   IpcHandler {
     target: "spotlight"
-    function toggle(): void { focusedBox.controlCenter = false; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = !focusedBox.spotlight; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.themePicker = false }
-    function show(): void { focusedBox.controlCenter = false; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = true; focusedBox.powerMenu = false; }
+    function toggle(): void { focusedBox.controlCenter = false; focusedBox.dashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = !focusedBox.spotlight; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.themePicker = false }
+    function show(): void { focusedBox.controlCenter = false; focusedBox.dashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = true; focusedBox.powerMenu = false; }
     function hide(): void { focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false }
   }
 
   IpcHandler {
     target: "wallpaperSwitcher"
-    function toggle(): void { focusedBox.controlCenter = false; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = !focusedBox.wallpaperSwitcherOpen; focusedBox.powerMenu = false; focusedBox.themePicker = false }
-    function show(): void { focusedBox.controlCenter = false; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = true; focusedBox.powerMenu = false; }
+    function toggle(): void { focusedBox.controlCenter = false; focusedBox.dashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = !focusedBox.wallpaperSwitcherOpen; focusedBox.powerMenu = false; focusedBox.themePicker = false }
+    function show(): void { focusedBox.controlCenter = false; focusedBox.dashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = true; focusedBox.powerMenu = false; }
     function hide(): void { focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false }
   }
 
   IpcHandler {
     target: "powerMenu"
-    function toggle(): void { focusedBox.controlCenter = false; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = !focusedBox.powerMenu; if (!focusedBox.powerMenu) focusedBox.powerMenuInitialAction = ""; focusedBox.themePicker = false }
-    function show(): void { focusedBox.controlCenter = false; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = true }
+    function toggle(): void { focusedBox.controlCenter = false; focusedBox.dashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = !focusedBox.powerMenu; if (!focusedBox.powerMenu) focusedBox.powerMenuInitialAction = ""; focusedBox.themePicker = false }
+    function show(): void { focusedBox.controlCenter = false; focusedBox.dashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = true }
     function hide(): void { focusedBox.powerMenu = false; focusedBox.powerMenuInitialAction = "" }
   }
 
   IpcHandler {
     target: "wifiState"
-    function toggle(): void { focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.bluetoothPanelOpen = false; focusedBox.audioPanelOpen = false; focusedBox.wifiPanelOpen = !focusedBox.wifiPanelOpen; focusedBox.controlCenter = focusedBox.wifiPanelOpen; focusedBox.themePicker = false }
-    function show(): void { focusedBox.controlCenter = true; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.bluetoothPanelOpen = false; focusedBox.audioPanelOpen = false; focusedBox.wifiPanelOpen = true }
+    function toggle(): void { focusedBox.dashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.bluetoothPanelOpen = false; focusedBox.audioPanelOpen = false; focusedBox.wifiPanelOpen = !focusedBox.wifiPanelOpen; focusedBox.controlCenter = focusedBox.wifiPanelOpen; focusedBox.themePicker = false }
+    function show(): void { focusedBox.controlCenter = true; focusedBox.dashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.bluetoothPanelOpen = false; focusedBox.audioPanelOpen = false; focusedBox.wifiPanelOpen = true }
     function hide(): void { focusedBox.powerMenu = false; focusedBox.wifiPanelOpen = false }
   }
 
   IpcHandler {
     target: "bluetoothState"
-    function toggle(): void { focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.wifiPanelOpen = false; focusedBox.audioPanelOpen = false; focusedBox.bluetoothPanelOpen = !focusedBox.bluetoothPanelOpen; focusedBox.controlCenter = focusedBox.bluetoothPanelOpen; focusedBox.themePicker = false }
-    function show(): void { focusedBox.controlCenter = true; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.wifiPanelOpen = false; focusedBox.audioPanelOpen = false; focusedBox.bluetoothPanelOpen = true }
+    function toggle(): void { focusedBox.dashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.wifiPanelOpen = false; focusedBox.audioPanelOpen = false; focusedBox.bluetoothPanelOpen = !focusedBox.bluetoothPanelOpen; focusedBox.controlCenter = focusedBox.bluetoothPanelOpen; focusedBox.themePicker = false }
+    function show(): void { focusedBox.controlCenter = true; focusedBox.dashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.wifiPanelOpen = false; focusedBox.audioPanelOpen = false; focusedBox.bluetoothPanelOpen = true }
     function hide(): void { focusedBox.powerMenu = false; focusedBox.bluetoothPanelOpen = false }
   }
 
   IpcHandler {
     target: "audioState"
-    function toggle(): void { focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.wifiPanelOpen = false; focusedBox.bluetoothPanelOpen = false; focusedBox.audioPanelOpen = !focusedBox.audioPanelOpen; focusedBox.controlCenter = focusedBox.audioPanelOpen; focusedBox.themePicker = false }
-    function show(): void { focusedBox.controlCenter = true; focusedBox.miniDashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.wifiPanelOpen = false; focusedBox.bluetoothPanelOpen = false; focusedBox.audioPanelOpen = true }
+    function toggle(): void { focusedBox.dashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.wifiPanelOpen = false; focusedBox.bluetoothPanelOpen = false; focusedBox.audioPanelOpen = !focusedBox.audioPanelOpen; focusedBox.controlCenter = focusedBox.audioPanelOpen; focusedBox.themePicker = false }
+    function show(): void { focusedBox.controlCenter = true; focusedBox.dashboard = false; focusedBox.cliphistOpen = false; focusedBox.spotlight = false; focusedBox.wallpaperSwitcherOpen = false; focusedBox.powerMenu = false; focusedBox.wifiPanelOpen = false; focusedBox.bluetoothPanelOpen = false; focusedBox.audioPanelOpen = true }
     function hide(): void { focusedBox.powerMenu = false; focusedBox.audioPanelOpen = false }
   }
 
@@ -99,10 +100,114 @@ ShellRoot {
   }
 
   // IPC and the root-level OSDs act on the pill of the monitor under focus (follows the mouse)
-  readonly property var focusedBox: {
+  readonly property var focusedWindow: {
     const wins = pillWindows.instances
-    const w = wins.find(w => w.screen && Hyprland.focusedMonitor && w.screen.name === Hyprland.focusedMonitor.name) || wins[0]
-    return w ? w.pill : null
+    return wins.find(w => w.screen && Hyprland.focusedMonitor && w.screen.name === Hyprland.focusedMonitor.name) || wins[0] || null
+  }
+  readonly property var focusedBox: focusedWindow ? focusedWindow.pill : null
+
+  // clipboard image being dragged out of the full preview (null when idle);
+  // x/y are window coords reported by the drag area via mapToItem(null)
+  property var clipDragImage: null
+  // drag is live (pointer still tracked by the panel) — guards the async
+  // handoff so a drag that ends before the native start can't resurrect
+  property bool clipDragLive: false
+  // true once the drag crosses the pill edge and the native (browser/file
+  // manager) drag takes over from the manual ghost
+  property bool clipDragNative: false
+  // drop action reported by Drag.dragFinished, Qt.IgnoreAction by default
+  property int clipDragResult: Qt.IgnoreAction
+  property url clipDragIcon: ""
+  readonly property url clipDragUrl: clipDragImage ? "file://" + clipDragImage.path : ""
+  // the ghost item, so panels can grab its thumbnail for the drag icon
+  property Item dragGhost: null
+
+  function beginNativeImageDrag() {
+    if (clipDragNative || !clipDragLive || !clipDragImage) return
+    dragGhost.grabToImage(function (result) {
+      // the drag may have ended while the grab was in flight
+      if (!clipDragLive || !clipDragImage) return
+      clipDragIcon = result.url
+      clipDragNative = true
+    }, Qt.size(180, 130))
+  }
+
+  // a catcher (browser, file manager...) accepting the drop yields a real
+  // drop action and nothing else happens; an ignored drop applies the
+  // wallpaper unless the cursor came back over the pill (cancel)
+  function finishClipDrag(dropAction) {
+    let img = clipDragImage
+    clipDragNative = false
+    clipDragLive = false
+    clipDragImage = null
+    clipDragIcon = ""
+    if (!img) return
+    if (dropAction !== Qt.IgnoreAction) return
+    dropTargetProbe.img = img
+    dropTargetProbe.running = false
+    dropTargetProbe.running = true
+  }
+
+  // cursor position at the moment of the drop, for the pill/cancel check
+  Process {
+    id: dropTargetProbe
+    property var img: null
+    command: ["sh", "-c", 'hyprctl cursorpos | tr -d " "']
+    stdout: StdioCollector {
+      onStreamFinished: {
+        let img = dropTargetProbe.img
+        dropTargetProbe.img = null
+        if (!img) return
+        let m = /^(\d+),(\d+)$/.exec(this.text.trim())
+        if (!m) return
+        // the pill of the focused monitor: the drop point is checked against it
+        const win = shellRoot.focusedWindow
+        const pill = win ? win.pill : null
+        if (!pill) return
+        let p = pill.mapFromItem(null, Number(m[1]), Number(m[2]) - win.margins.top)
+        if (p.x >= 0 && p.y >= 0 && p.x <= pill.width && p.y <= pill.height) return
+        shellRoot.saveCurrentWallpaper(img.path)
+        shellRoot.applyWallpaper(img.path)
+        pill.cliphistOpen = false
+      }
+    }
+  }
+
+  // true while the native drag is running (mirrors the ghost's Drag.active)
+  readonly property bool clipDragActive: dragGhost ? dragGhost.Drag.active : false
+  // if the drag ended but Drag.dragFinished never fired, finalize shortly after
+  onClipDragActiveChanged: {
+    if (clipDragActive || !clipDragNative || !clipDragImage) clipDragWatchdog.stop()
+    else clipDragWatchdog.restart()
+  }
+
+  // Drag.dragFinished is the primary end signal; this catches platforms
+  // where it doesn't fire so the state can't get stuck
+  Timer {
+    id: clipDragWatchdog
+    interval: 250
+    onTriggered: if (shellRoot.clipDragNative) shellRoot.finishClipDrag(shellRoot.clipDragResult)
+  }
+
+  // shared by the wallpaper switcher and the clipboard image drop target
+  function applyWallpaper(path) {
+    if (Config.customWallpaperScript.trim() === "") {
+      Quickshell.execDetached(["awww", "img", "--transition-type", "random", path])
+    }
+    else {
+      let script = Config.customWallpaperScript
+      let cmd = script.includes("{path}")
+          ? script.replace(/["']?\{path\}["']?/g, "\"$1\"")
+          : script + " \"$1\"" // fallback for old-style configs without the placeholder
+      Quickshell.execDetached(["sh", "-c", cmd, "_", path])
+    }
+  }
+
+  function saveCurrentWallpaper(path) {
+    // execDetached, not a Process child: callers may close panels right after,
+    // which would kill a child Process before it ever runs
+    Quickshell.execDetached(["sh", "-c", 'mkdir -p "$1" && printf %s "$2" > "$1/last_wallpaper"',
+      "_", Quickshell.env("HOME") + "/.cache/chillpill-shell", path])
   }
 
   property string bg: Theme.bg
@@ -176,8 +281,7 @@ ShellRoot {
     // overlay, so the pill shows over a fullscreen window that has lost focus
     WlrLayershell.layer: WlrLayershell.Overlay
     WlrLayershell.keyboardFocus: (box.wifiPanelOpen || box.bluetoothPanelOpen || box.audioPanelOpen || box.cliphistOpen || box.spotlight || box.wallpaperSwitcherOpen || box.themePicker || box.powerMenu || box.sysmon !== "" ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None)
-    implicitHeight: Math.max(885 * scale, calendarLoader.item && calendarLoader.item.visible
-            ? calendarLoader.y + calendarLoader.item.height : 0)
+    implicitHeight: 885 * scale
     onScreenChanged: console.log("dpi:", screen.devicePixelRatio)
     property real scale: screen ? screen.devicePixelRatio : 1.0
 
@@ -188,8 +292,9 @@ ShellRoot {
     }
 
     // reserve top space only while the pill is shown
-    margins.top: box.revealed ? Config.pillTopMargin : 0
-    exclusiveZone: box.revealed ? Config.pillBottomMargin : 0
+    margins.top: box.revealed ? (Config.pillNotch ? 0 : Config.pillTopMargin) : 0
+    margins.bottom: box.revealed && Config.pillNotch ? Config.pillBottomMargin : 0
+    exclusiveZone: box.revealed ? (Config.pillNotch ? Config.pillBottomMargin + 4 : Config.pillBottomMargin) : 0
     color: Theme.transparent
 
     // Mask input to only the capsule
@@ -207,20 +312,6 @@ ShellRoot {
         width: (Config.pillOnHover && !box.revealed && !panelWindow.fullscreenHere) ? Math.ceil(panelWindow.width) : 0
         height: (Config.pillOnHover && !box.revealed && !panelWindow.fullscreenHere) ? Math.ceil(hoverRevealAreaItem.height) : 0
       }
-      Region {
-        intersection: Intersection.Combine
-        x: calendarLoader.item ? Math.floor(calendarLoader.x + calendarLoader.item.x) : 0
-        y: calendarLoader.item ? Math.floor(calendarLoader.y + calendarLoader.item.y) : 0
-        width: calendarLoader.item && calendarLoader.item.shown ? Math.ceil(calendarLoader.item.width) : 0
-        height: calendarLoader.item && calendarLoader.item.shown ? Math.ceil(calendarLoader.item.height) : 0
-      }
-      Region {
-          intersection: Intersection.Combine
-          x: weatherPopupLoader.item ? Math.floor(weatherPopupLoader.item.x) : 0
-          y: weatherPopupLoader.item ? Math.floor(weatherPopupLoader.item.y) : 0
-          width: weatherPopupLoader.item && weatherPopupLoader.item.shown ? Math.ceil(weatherPopupLoader.item.width) : 0
-          height: weatherPopupLoader.item && weatherPopupLoader.item.shown ? Math.ceil(weatherPopupLoader.item.height) : 0
-      }
     }
 
     // reveal the pill when hovering the top edge in pillOnHover mode.
@@ -230,11 +321,11 @@ ShellRoot {
       id: hoverRevealAreaItem
       anchors {
         top: parent.top
-        topMargin: -Math.round(Config.pillTopMargin)
+        topMargin: (Config.pillNotch && !box.revealed) ? 0 : -Math.round(Config.pillTopMargin)
         left: parent.left
         right: parent.right
       }
-      height: Math.max(box.implicitHeight + Config.pillTopMargin + 8, 48)
+      height: Math.max(box.implicitHeight + (Config.pillNotch ? 4 : Config.pillTopMargin) + 8, 48)
 
       HoverHandler {
         id: revealHover
@@ -251,20 +342,60 @@ ShellRoot {
       onTriggered: panelWindow.pillHoverActive = false
     }
 
+    // ghost image following the cursor while a clipboard image is dragged
+    // out of the full preview; kept unclipped at window level so it can
+    // travel past the pill while dragging. Once the cursor leaves the pill
+    // the same item becomes the source of a native drag (uri payload), so
+    // the image can be dropped into browsers, file managers, etc.
+    Image {
+      id: clipDragGhost
+      visible: shellRoot.clipDragImage !== null && !shellRoot.clipDragNative
+      x: visible ? shellRoot.clipDragImage.x - width / 2 : 0
+      y: visible ? shellRoot.clipDragImage.y - height / 2 : 0
+      width: 220
+      height: 150
+      fillMode: Image.PreserveAspectFit
+      cache: false
+      source: shellRoot.clipDragImage !== null ? "file://" + shellRoot.clipDragImage.path : ""
+      opacity: visible ? 1 : 0
+      Behavior on opacity { NumberAnimation { duration: 120 } }
+
+      Drag.dragType: Drag.Automatic
+      Drag.active: shellRoot.clipDragNative
+      Drag.supportedActions: Qt.CopyAction
+      Drag.proposedAction: Qt.CopyAction
+      // center the drag icon on the cursor instead of its top-left corner
+      Drag.hotSpot: Qt.point(90, 65)
+      Drag.imageSource: shellRoot.clipDragIcon
+      Drag.mimeData: {
+        "text/uri-list": shellRoot.clipDragUrl
+      }
+      Drag.onDragFinished: (dropAction) => {
+        shellRoot.clipDragResult = dropAction
+        shellRoot.finishClipDrag(dropAction)
+      }
+
+      Component.onCompleted: shellRoot.dragGhost = clipDragGhost
+      Component.onDestruction: if (shellRoot.dragGhost === clipDragGhost) shellRoot.dragGhost = null
+    }
+
     // shadow under the pill, drawn as its own item so the pill itself stays
     // unlayered (a layer would re-render it at unscaled size and blur it)
     Item {
       id: pillShadow
+      z: -2
       readonly property real pad: 24
       readonly property real drop: 5 * box.dpi
       readonly property real visX: box.x - box.width * (box.dpi - 1) / 2
       readonly property real visW: box.width * box.dpi
       x: visX - pad
       y: box.y - pad
-      width: visW + pad * 2
+      width: visW + pad * 2 + (Config.pillNotch ? notchShape.r * 2 : 0)
       height: box.height * box.dpi + pad * 2.2
-      opacity: box.opacity
-      visible: Config.showShadows && box.visible && opacity > 0
+      property real t: Config.showShadows ? 1 : 0
+      Behavior on t { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
+      opacity: box.opacity * t
+      visible: box.visible && opacity > 0
 
       Rectangle {
         id: pillShadowSource
@@ -287,15 +418,55 @@ ShellRoot {
       }
     }
 
+    // macOS notch background: pill flush to the top screen edge with smooth
+    // rounded corners (chillnotch style). Sibling of box (not a child) so
+    // box.clip never cuts the flared tips; box goes transparent and the shape
+    // draws the background.
+    Shape {
+      id: notchShape
+      anchors.top: box.top
+      anchors.horizontalCenter: box.horizontalCenter
+      // flared tips extend r beyond the pill on each side, sharp tips at the
+      // top edge flush with the screen
+      width: box.width + 2 * notchShape.r
+      height: box.height
+      scale: box.dpi
+      transformOrigin: Item.Top
+      z: -1
+      layer.enabled: true
+      layer.samples: 4
+      visible: Config.pillNotch && box.opacity > 0
+      opacity: box.opacity
+      Behavior on opacity { NumberAnimation { duration: 220; easing.type: Easing.OutExpo } }
+      readonly property real r: Math.min(box.radius, box.width / 2, box.height / 2)
+      ShapePath {
+        fillColor: box.wifiPanelOpen || box.bluetoothPanelOpen ? Theme.bgD : Theme.bg
+        strokeColor: "transparent"
+        PathSvg {
+          // sharp top tips with concave shoulders, straight sides, rounded
+          // bottom corners (chillnotch path)
+          path: "M 0 0 " +
+                "Q " + notchShape.r + " 0, " + notchShape.r + " " + notchShape.r + " " +
+                "L " + notchShape.r + " " + (notchShape.height - notchShape.r) + " " +
+                "Q " + notchShape.r + " " + notchShape.height + ", " + (notchShape.r * 2) + " " + notchShape.height + " " +
+                "L " + (notchShape.width - notchShape.r * 2) + " " + notchShape.height + " " +
+                "Q " + (notchShape.width - notchShape.r) + " " + notchShape.height + ", " + (notchShape.width - notchShape.r) + " " + (notchShape.height - notchShape.r) + " " +
+                "L " + (notchShape.width - notchShape.r) + " " + notchShape.r + " " +
+                "Q " + (notchShape.width - notchShape.r) + " 0, " + notchShape.width + " 0 " +
+                "Z"
+        }
+      }
+    }
+
     // main dynamic pill bar
     Rectangle {
       id: box
       anchors.top: parent.top
       anchors.horizontalCenter: parent.horizontalCenter
-      readonly property bool revealed: !Config.pillOnHover
+      readonly property bool revealed: Config.pillNotch || !Config.pillOnHover
         || panelWindow.pillHoverActive
         || controlCenter
-        || miniDashboard
+        || dashboard
         || cliphistOpen
         || spotlight
         || wallpaperSwitcherOpen
@@ -320,6 +491,7 @@ ShellRoot {
       property var clockModule: clock
       property var brightnessSource: brightnessModule
       property var vpnModule: null
+      property var micModule: null
 
       property bool tooltipVisible: false
       property string tooltipModule: ""
@@ -328,8 +500,6 @@ ShellRoot {
       property real tooltipY: 0
 
       property bool spotlight: false
-      // the calendar is only built while it is (or is fading out) visible
-      property bool calendarShown: false
       // spotlight is heavy (app cache), so it is only built the first time it is
       // opened and dropped a while after it closes again
       readonly property int spotlightUnloadDelay: 60000
@@ -349,7 +519,7 @@ ShellRoot {
         onTriggered: box.spotlightLoaded = false
       }
       property bool hovered: false
-      property bool miniDashboard: false
+      property bool dashboard: false
       property bool controlCenter: false
       property bool wifiPanelOpen: false
       // the panel is a Loader (see wifiPanelHost): built on first open, kept
@@ -421,7 +591,7 @@ ShellRoot {
         sysmon = kind
       }
       // any other pill state takes over from the panel
-      readonly property bool otherPanelOpen: controlCenter || miniDashboard || cliphistOpen || spotlight
+      readonly property bool otherPanelOpen: controlCenter || dashboard || cliphistOpen || spotlight
         || wallpaperSwitcherOpen || powerMenu || themePicker
       onOtherPanelOpenChanged: if (otherPanelOpen) sysmon = ""
 
@@ -506,12 +676,12 @@ ShellRoot {
                      : activeOsd === "timer" ? osdWidth
                      : activeOsd === "volume" ? osdWidth
                      : activeOsd === "brightness" ? osdWidth
-                     : (notificationModule.active && !notifFullscreenMode) ? 320
+                     : (notificationModule.active && !notifFullscreenMode) ? 326
                      : powerMenu ? 350
                      : controlCenter ? (wifiPanelOpen ? wifiPanelBoxWidth : bluetoothPanelOpen ? bluetoothPanelBoxWidth : ccBaseWidth)
                      : spotlight ? 328
-                     : miniDashboard ? 420
-                     : themePicker ? 310
+                     : dashboard ? (dashboardLoader.item ? dashboardLoader.item.implicitWidth + 14 : 546)
+                     : themePicker ? 295
                      : (cliphistOpen && cliphistPreviewing) ? 400
                      : wallpaperSwitcherOpen ? 600
                      : cliphistOpen ? 440
@@ -523,7 +693,7 @@ ShellRoot {
                   : activeOsd === "timer" ? osdHeight
                   : activeOsd === "volume" ? osdHeight
                   : activeOsd === "brightness" ? osdHeight
-                  : (notificationModule.active && !notifFullscreenMode) ? 52
+                  : (notificationModule.active && !notifFullscreenMode) ? 60
                   : powerMenu ? 102
                   : wifiPanelOpen ? wifiPanelHeight
                   : bluetoothPanelOpen ? bluetoothPanelHeight
@@ -533,14 +703,14 @@ ShellRoot {
                                  audioPanelOpen && audioPanelLoader.item ? audioPanelLoader.item.contentHeight + 25 : 0)
                   : (cliphistOpen && cliphistPreviewing) ? 380
                   : themePicker ? 320
-                  : miniDashboard ? 155
+                  : dashboard ? (dashboardLoader.item ? dashboardLoader.item.implicitHeight + 16 : 480)
                   : spotlight
                       ? (spotlightLoader.item ? spotlightLoader.item.height + 15 : 250)
                   : wallpaperSwitcherOpen ? 308
                   : cliphistOpen ? 276
                   : sysmon !== "" ? 305
                   : mediaPopupShown ? 94
-                  : (row.implicitHeight * Config.pillScale) + 10
+                  : (row.implicitHeight * Config.pillScale) + (Config.pillNotch ? 4 : 0) + 10
 
       readonly property real baseRadius: notificationModule.active ? 99
         : cliphistOpen && cliphistPreviewing ? 33
@@ -551,8 +721,8 @@ ShellRoot {
           ? (mprisModule.hasPlayer ? 27 : 25)
           : (mprisModule.hasPlayer ? 26 : 22))
         : spotlight ? 29
-        : miniDashboard ? 20
-        : themePicker ? 26
+        : dashboard ? 27
+        : themePicker ? 28
         : wallpaperSwitcherOpen ? 30
         : activeOsd !== "" ? 20
         : powerMenu ? 22
@@ -570,16 +740,7 @@ ShellRoot {
           NumberAnimation { duration: 225; easing.type: Easing.OutExpo }
       }
 
-      color: wifiPanelOpen || bluetoothPanelOpen ? Theme.bgD : bg
-
-      onCalendarShownChanged: if (calendarLoader.item) calendarLoader.item.shown = box.calendarShown
-
-      onMiniDashboardChanged: {
-          if (!box.miniDashboard) {
-              box.calendarShown = false
-              if (weatherPopupLoader.item) weatherPopupLoader.item.shown = false
-          }
-      }
+      color: Config.pillNotch ? "transparent" : (wifiPanelOpen || bluetoothPanelOpen ? Theme.bgD : bg)
 
       Behavior on implicitWidth { NumberAnimation { duration: 225; easing.type: Easing.OutExpo } }
       NumberAnimation { id: heightAnim; target: box; property: "height"; easing.type: Easing.OutExpo }
@@ -620,10 +781,10 @@ ShellRoot {
             return
           }
 
-          // mini dashboard accept only right
-          if (box.miniDashboard) {
+          // dashboard accept only right
+          if (box.dashboard) {
             if (mouse.button === Qt.RightButton) {
-              box.miniDashboard = false
+              box.dashboard = false
             }
             return
           }
@@ -668,13 +829,13 @@ ShellRoot {
           }
 
           if (mouse.button === Qt.RightButton) {
-              console.log("Right click detected, opening mini dashboard")
+              console.log("Right click detected, opening dashboard")
               mediaAutoOpened = false
               box.spotlight = false
               box.wallpaperSwitcherOpen = false
               box.powerMenu = false
               box.powerMenuInitialAction = ""
-              box.miniDashboard = !box.miniDashboard
+              box.dashboard = !box.dashboard
           }
         }
       }
@@ -781,6 +942,11 @@ ShellRoot {
             shown: box.cliphistOpen
             onCloseRequested: box.cliphistOpen = false
             onPreviewToggled: (active) => box.cliphistPreviewing = active
+            onImageDroppedAsWallpaper: (path) => {
+              shellRoot.saveCurrentWallpaper(path)
+              shellRoot.applyWallpaper(path)
+              box.cliphistOpen = false
+            }
           }
         }
       }
@@ -794,7 +960,7 @@ ShellRoot {
                  && !notificationModule.active
                  && box.activeOsd === ""
                  && !box.controlCenter
-                 && !box.miniDashboard
+                 && !box.dashboard
                  && !box.cliphistOpen
                  && !box.spotlight
                  && !box.powerMenu ? 1 : 0
@@ -837,7 +1003,7 @@ ShellRoot {
                    && !notificationModule.active
                    && box.activeOsd === ""
                    && !box.controlCenter
-                   && !box.miniDashboard
+                   && !box.dashboard
                    && !box.cliphistOpen
                    && !box.powerMenu ? 1 : 0
           visible: opacity > 0
@@ -874,7 +1040,7 @@ ShellRoot {
                    && !notificationModule.active
                    && box.activeOsd === ""
                    && !box.controlCenter
-                   && !box.miniDashboard
+                   && !box.dashboard
                    && !box.cliphistOpen
                    && !box.spotlight
                    && !box.wallpaperSwitcherOpen ? 1 : 0
@@ -924,7 +1090,7 @@ ShellRoot {
                    && !notificationModule.active
                    && !box.controlCenter
                    && !box.cliphistOpen
-                   && !box.miniDashboard
+                   && !box.dashboard
                    && !box.spotlight
                    && !box.wallpaperSwitcherOpen
                    && !box.powerMenu
@@ -1061,12 +1227,12 @@ ShellRoot {
         }
       }
 
-      // mini dashboard opens on right click
+      // dashboard opens on right click
       Item {
         anchors.centerIn: parent
-        width: box.implicitWidth - 30
-        height: box.miniDashboard ? box.implicitHeight - 30 : 0  // don't fight the animation
-        opacity: box.miniDashboard
+        width: box.implicitWidth - 14
+        height: box.dashboard ? box.implicitHeight - 14 : 0  // don't fight the animation
+        opacity: box.dashboard
                  && !notificationModule.active
                  && box.activeOsd === ""
                  && !box.cliphistOpen
@@ -1075,7 +1241,7 @@ ShellRoot {
 
         Behavior on opacity {
           SequentialAnimation {
-            PauseAnimation { duration: box.miniDashboard ? 1 : 0 }
+            PauseAnimation { duration: box.dashboard ? 1 : 0 }
             NumberAnimation { duration: 300; easing.type: Easing.OutExpo }
           }
         }
@@ -1085,18 +1251,18 @@ ShellRoot {
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             onClicked: (mouse) => {
                 if (mouse.button === Qt.RightButton)
-                    box.miniDashboard = !box.miniDashboard
+                    box.dashboard = !box.dashboard
             }
         }
 
-        // only exists while the mini dashboard is open
+        // only exists while the dashboard is open
         Loader {
-          id: miniDashboardLoader
+          id: dashboardLoader
           anchors.fill: parent
-          active: box.miniDashboard
+          active: box.dashboard
           asynchronous: true
 
-          sourceComponent: MiniDashboard {}
+          sourceComponent: Dashboard {}
         }
       }
 
@@ -1104,8 +1270,8 @@ ShellRoot {
       Item {
         id: themePickerItem
         anchors.centerIn: parent
-        width: box.implicitWidth - 30
-        height: box.themePicker ? box.implicitHeight - 30 : 0
+        width: box.implicitWidth - 16
+        height: box.themePicker ? box.implicitHeight - 16 : 0
         opacity: box.themePicker
                  && !notificationModule.active
                  && box.activeOsd === "" ? 1 : 0
@@ -1167,58 +1333,6 @@ ShellRoot {
       }
     }
 
-    // built on the first open, then freed once it has faded out
-    Loader {
-      id: calendarLoader
-      x: (parent.width - 225 * box.dpi) / 2      // centering lives here now
-      y: box.y + box.height * box.dpi + 5 * box.dpi  // stays live while the pill animates
-      active: box.calendarShown || (item && item.opacity > 0)
-      asynchronous: true
-
-      sourceComponent: CalendarBox {}
-      onLoaded: item.shown = box.calendarShown
-    }
-
-    Loader {
-        id: weatherPopupLoader
-        active: false
-        asynchronous: false
-
-        sourceComponent: WeatherPopup {
-            onShownChanged: if (!shown) closeTimer.start()
-        }
-
-        onLoaded: item.shown = true
-        Timer {
-            id: closeTimer
-            interval: 250
-            onTriggered: weatherPopupLoader.active = false
-        }
-    }
-
-    // open calendar when click on date in mini dashboard
-    Connections {
-      target: miniDashboardLoader.item
-      function onToggleCalendar() {
-        box.calendarShown = !box.calendarShown
-        if (box.calendarShown && calendarLoader.item) calendarLoader.item.resetView()
-        if (weatherPopupLoader.item) weatherPopupLoader.item.shown = false
-      }
-    }
-
-    // open weather when click on weather in mini dashboard
-    Connections {
-      target: miniDashboardLoader.item
-      function onToggleWeather() {
-        if (mediaPopupShown) return
-        if (!weatherPopupLoader.active)
-          weatherPopupLoader.active = true
-        else
-          weatherPopupLoader.item.shown = !weatherPopupLoader.item.shown
-        box.calendarShown = false
-      }
-    }
-
     Connections {
         target: mprisModule
         function onNowPlaying() {
@@ -1276,41 +1390,104 @@ ShellRoot {
   FullscreenOsd {
     id: fsNotif
     active: notificationModule.active && notifFullscreenMode
-    cardWidth: 300 * focusedBox.dpi
-    cardHeight: 52 * focusedBox.dpi
+    cardWidth: 326 * focusedBox.dpi
+    cardHeight: 60 * focusedBox.dpi
 
     property var displayNotif: null
+    property var pendingNotif: null
+    // countdown progress 1→0, drawn as the ring around the icon chip
+    property real timeFrac: 1
+    onTimeFracChanged: ringCanvas.requestPaint()
+
+    function showNotif(next) {
+      if (active && displayNotif && displayNotif !== next) {
+        pendingNotif = next
+        fsSwap.restart()
+      } else {
+        displayNotif = next
+        fsShrink.restart()
+      }
+    }
 
     RowLayout {
       Layout.alignment: Qt.AlignVCenter
-      spacing: 12 * focusedBox.dpi
+      spacing: 10 * focusedBox.dpi
+      transform: Translate { id: fsSlide; x: 0 }
 
-      Text {
-        text: String.fromCodePoint(0xf0f3)
-        color: Theme.fg
-        font { family: Theme.nerdFontFamily; pixelSize: 14 * focusedBox.dpi }
-        visible: cardIcon.status !== Image.Ready
-      }
+      Rectangle {
+        Layout.preferredWidth: 30 * focusedBox.dpi
+        Layout.preferredHeight: 30 * focusedBox.dpi
+        radius: 20 * focusedBox.dpi
+        color: Theme.bg2
 
-      Image {
-        id: cardIcon
-        width: 23; height: 23
-        fillMode: Image.PreserveAspectCrop
-        source: {
-          if (fsNotif.displayNotif && fsNotif.displayNotif.image) return fsNotif.displayNotif.image
-          if (fsNotif.displayNotif && fsNotif.displayNotif.appIcon) {
-            return fsNotif.displayNotif.appIcon.startsWith("/")
-              ? "file://" + fsNotif.displayNotif.appIcon
-              : "image://icon/" + fsNotif.displayNotif.appIcon
-          }
-          return ""
+        Text {
+          anchors.centerIn: parent
+          text: String.fromCodePoint(0xf0f3)
+          color: Theme.fg
+          font { family: Theme.nerdFontFamily; pixelSize: 14 * focusedBox.dpi }
+          visible: cardIcon.status !== Image.Ready
         }
-        sourceSize: Qt.size(23 * focusedBox.dpi, 23 * focusedBox.dpi)
-        visible: status === Image.Ready
+
+        Image {
+          id: cardIcon
+          anchors.centerIn: parent
+          width: 18 * focusedBox.dpi
+          height: 18 * focusedBox.dpi
+          fillMode: Image.PreserveAspectFit
+          source: {
+            if (fsNotif.displayNotif && fsNotif.displayNotif.image) return fsNotif.displayNotif.image
+            if (fsNotif.displayNotif && fsNotif.displayNotif.appIcon) {
+              return fsNotif.displayNotif.appIcon.startsWith("/")
+                ? "file://" + fsNotif.displayNotif.appIcon
+                : "image://icon/" + fsNotif.displayNotif.appIcon
+            }
+            return ""
+          }
+          sourceSize: Qt.size(18 * focusedBox.dpi, 18 * focusedBox.dpi)
+          visible: status === Image.Ready
+        }
+
+        // countdown ring around the chip: accent arc unwinds from 12 o'clock
+        Canvas {
+          id: ringCanvas
+          anchors.fill: parent
+          anchors.margins: -3 * focusedBox.dpi
+          antialiasing: true
+
+          onPaint: {
+            const ctx = getContext("2d")
+            ctx.reset()
+            const cx = width / 2, cy = height / 2
+            const lw = 2.5 * focusedBox.dpi
+            const r = parent.width / 2 + lw / 2 // hug the chip's outer edge
+            ctx.lineWidth = lw
+            ctx.lineCap = "round"
+            ctx.strokeStyle = Qt.alpha(Theme.accent, 0.22)
+            ctx.beginPath()
+            ctx.arc(cx, cy, r, 0, 2 * Math.PI)
+            ctx.stroke()
+            if (fsNotif.timeFrac > 0) {
+              ctx.strokeStyle = Theme.accent
+              ctx.beginPath()
+              ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI * fsNotif.timeFrac)
+              ctx.stroke()
+            }
+          }
+        }
       }
 
       ColumnLayout {
         spacing: 3 * focusedBox.dpi
+
+        Text {
+          text: fsNotif.displayNotif && fsNotif.displayNotif.appName ? fsNotif.displayNotif.appName : ""
+          textFormat: Text.PlainText
+          color: Theme.fg3
+          font { family: Theme.fontFamily; pixelSize: 8 * focusedBox.dpi; weight: 600; letterSpacing: 0.5 }
+          elide: Text.ElideRight
+          Layout.maximumWidth: 200
+          visible: text !== "" && Config.showNotifAppName
+        }
 
         Text {
           text: fsNotif.displayNotif ? fsNotif.displayNotif.summary : ""
@@ -1336,6 +1513,43 @@ ShellRoot {
         }
       }
     }
+
+    extra: [
+      NumberAnimation {
+        id: fsShrink
+        target: fsNotif
+        property: "timeFrac"
+        from: 1
+        to: 0
+        duration: Config.notificationDisplayTime
+        easing.type: Easing.Linear
+      },
+
+      // queued-notification swap: slide old content out left, swap, slide new in
+      SequentialAnimation {
+        id: fsSwap
+
+        ParallelAnimation {
+          NumberAnimation { target: fsNotif.cardOpacity; property: "opacity"; to: 0; duration: 110; easing.type: Easing.InQuad }
+          NumberAnimation { target: fsSlide; property: "x"; to: -14 * focusedBox.dpi; duration: 110; easing.type: Easing.InQuad }
+        }
+
+        ScriptAction {
+          script: {
+            fsNotif.displayNotif = fsNotif.pendingNotif
+            fsNotif.pendingNotif = null
+            fsSlide.x = 14 * focusedBox.dpi
+            fsNotif.timeFrac = 1
+            fsShrink.restart()
+          }
+        }
+
+        ParallelAnimation {
+          NumberAnimation { target: fsNotif.cardOpacity; property: "opacity"; to: 1; duration: 150; easing.type: Easing.OutCubic }
+          NumberAnimation { target: fsSlide; property: "x"; to: 0; duration: 150; easing.type: Easing.OutCubic }
+        }
+      }
+    ]
   }
 
   Connections {
@@ -1348,10 +1562,13 @@ ShellRoot {
             focusedBox.audioPanelOpen = false
         } else {
             notifFullscreenMode = false
+            // if a hide lands mid-swap, unstick the content fade
+            fsNotif.cardOpacity = 1
+            fsNotif.timeFrac = 1
         }
     }
     function onCurrentChanged() {
-      if (notificationModule.current) fsNotif.displayNotif = notificationModule.current
+      if (notificationModule.current) fsNotif.showNotif(notificationModule.current)
     }
   }
 

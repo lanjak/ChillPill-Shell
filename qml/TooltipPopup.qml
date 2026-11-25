@@ -132,6 +132,12 @@ PanelWindow {
       case "netSpeed":
         return "Peak in the last minute ↓" + SysStats.formatRate(SysStats.peak(SysStats.rxHistory)).trim()
           + " ↑" + SysStats.formatRate(SysStats.peak(SysStats.txHistory)).trim()
+      case "mic": {
+        const m = box.micModule   // force-read
+        if (!m || !m.ready) return "No microphone"
+        if (m.muted) return "Mic muted"
+        return "Mic • " + m.vol + "%"
+      }
       case "notifications": {
         const m = notificationModule
         if (!m || m.notifications.length === 0) return "No Notifications"

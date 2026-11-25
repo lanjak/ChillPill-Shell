@@ -1,4 +1,5 @@
 import Quickshell
+import Quickshell.Services.SystemTray
 import QtQuick
 
 Row {
@@ -9,7 +10,7 @@ Row {
            && !notificationModule.active
            && !mediaAutoOpened
            && !box.controlCenter
-           && !box.miniDashboard
+           && !box.dashboard
            && !box.powerMenu
            && box.activeOsd === ""
            && !box.wallpaperSwitcherOpen
@@ -48,22 +49,37 @@ Row {
       implicitWidth: moduleLoader.implicitWidth
       implicitHeight: moduleLoader.implicitHeight
 
-      // pillModules entries can be a module name ('clock') or a waybar-style
-      // custom module object ({ "run": "...", ... }) handled by CustomBarModule.qml
+      // pillModules entries can be a module name ('clock'), a waybar-style
+      // custom module object ({ "run": "...", ... }) handled by CustomBarModule.qml,
+      // or a tray module object ({ "tray": "<id>" }) handled by TrayModule.qml
       readonly property bool isCustom: typeof modelData === "object" && modelData !== null
+      readonly property bool isTray: isCustom && modelData.tray !== undefined
       readonly property string moduleID: isCustom ? "custom" + index : String(modelData)
 
-      // a module can report empty (tray with no icons) to drop out of the row and its spacing
-      visible: (!isCustom || !!modelData.run) && !(moduleLoader.item && moduleLoader.item.empty === true)
+      // tray entries vanish (Row skips them, no gap) while their app is not running
+      function trayItemFor(id) {
+        const list = SystemTray.items.values
+        for (let i = 0; i < list.length; i++) if (String(list[i].id) === id) return list[i]
+        return null
+      }
+      // a module can also report empty (the tray module with no icons) to drop out of the row and its spacing
+      visible: (!isCustom || (isTray ? trayItemFor(String(modelData.tray)) !== null : !!modelData.run))
+               && !(moduleLoader.item && moduleLoader.item.empty === true)
 
       Loader {
         id: moduleLoader
         anchors.fill: parent
-        source: isCustom ? "CustomBarModule.qml" : moduleFile(modelData)
+        source: isTray ? "TrayModule.qml"
+              : isCustom ? "CustomBarModule.qml" : moduleFile(modelData)
         // every bar module builds in parallel off the GUI thread, so the pill
         // shows up right away instead of after every module compiled
         asynchronous: true
         onLoaded: {
+          if (isTray) {
+            item.trayID = String(modelData.tray)
+            item.moduleID = moduleID
+            return
+          }
           if (isCustom) {
             item.spec = modelData
             item.moduleID = moduleID
@@ -88,6 +104,7 @@ Row {
             case "bluetooth": box.bluetoothModule = item; break
             case "clock":     box.clockModule = item; break
             case "vpn":       box.vpnModule = item; break
+            case "mic":       box.micModule = item; break
           }
         }
       }
@@ -95,7 +112,7 @@ Row {
         acceptedButtons: Qt.LeftButton
         // grab the press so the box behind does not also toggle the control center
         gesturePolicy: TapHandler.ReleaseWithinBounds
-        enabled: !isCustom && (modelData === "volume" || modelData === "network" || modelData === "bluetooth")
+        enabled: !isCustom && (modelData === "volume" || modelData === "network" || modelData === "bluetooth" || modelData === "mic")
         onTapped: {
           if (isCustom) return
           switch (modelData) {
@@ -112,16 +129,21 @@ Row {
               if (moduleLoader.item && moduleLoader.item.toggleBluetooth)
                 moduleLoader.item.toggleBluetooth()
               break
+            case "mic":
+              if (moduleLoader.item && moduleLoader.item.toggleMute)
+                moduleLoader.item.toggleMute()
+              break
           }
         }
       }
       HoverHandler {
         id: hoverHandler
         cursorShape: isCustom
-          ? (modelData.click
+          ? (isTray || modelData.click
              ? Qt.PointingHandCursor : Qt.ArrowCursor)
           : (modelData === "workspaces" || modelData === "volume"
-             || modelData === "network" || modelData === "bluetooth")
+             || modelData === "network" || modelData === "bluetooth"
+             || modelData === "mic")
             ? Qt.PointingHandCursor : Qt.ArrowCursor
         onHoveredChanged: {
           if (hovered) {

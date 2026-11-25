@@ -24,7 +24,7 @@ if [[ ! "$EUID" -eq 0 ]]; then
 fi
 
 needed_pkgs=(quickshell cliphist brightnessctl
-             wl-clipboard inotify-tools cmake
+             wl-clipboard cmake
              qt6-multimedia python-psutil blueman pipewire
 )
 
@@ -96,7 +96,6 @@ bin_exists awww || warn "Awww not installed. it will be needed if you don't use 
 bin_exists quickshell || die "Quickshell not installed."
 bin_exists cliphist || die "Cliphist not installed."
 bin_exists nusgmon || die "Nusgmon not installed."
-bin_exists inotifywait || die "Inotify not installed."
 bin_exists brightnessctl || die "Brightnessctl not installed."
 bin_exists cmake || die "Cmake not installed."
 bin_exists blueman-manager || warn "Blueman not installed." # warn here because not everyone use bluetooth
@@ -186,9 +185,9 @@ install -m 644 qml/* /usr/share/chillpill-shell
 
 # copy launcher (bash)
 info "Copying bash launchers (main shell, lockscreen and config-app)"
-install -m 755 launcher.sh /usr/local/bin/chillpill-shell
-install -m 755 config-launcher.sh /usr/local/bin/chillpill-config
-install -m 755 lockscreen.sh /usr/local/bin/chillpill-lock
+install -m 755 launcher.sh /usr/bin/chillpill-shell
+install -m 755 config-launcher.sh /usr/bin/chillpill-config
+install -m 755 lockscreen.sh /usr/bin/chillpill-lock
 
 # copy app launcher
 info "Copying app launchers"
@@ -256,6 +255,11 @@ fi
 info "Cleaning up build files"
 rm -rf build
 
+if bin_exists pgrep >/dev/null 2>/dev/null; then
+   if ! pgrep wl-paste >/dev/null 2>/dev/null; then
+      warn "wl-paste isn't active to copy/paste the clipboard content, please run it."
+   fi
+fi
 
 echo -e "\nRun the command '${GREEN}chillpill-shell${NC}' to start now."
 echo -e "or open '${GREEN}CP-Shell${NC}' through your current app launcher."

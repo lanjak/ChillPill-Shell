@@ -14,6 +14,7 @@ import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Widgets
 import Quickshell.Services.Pam
+import PillBackend
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Effects
@@ -43,6 +44,19 @@ Scope {
     readonly property real dpiScale: Config.dpiScale
     readonly property bool confirmPower: Config.confirmPowerActions
     readonly property bool showBattery: Config.pillModules.indexOf("battery") !== -1
+
+    // connected wifi (PillBackend WifiController, same source as the cc button)
+    readonly property bool wifiOk: WifiController.available && WifiController.enabled
+                                   && WifiController.currentSsid.length > 0
+
+    function wifiGlyph(sig) {
+        if (sig < 0) return String.fromCodePoint(0xf092d)
+        let tier = sig >= 75 ? 4
+                 : sig >= 50 ? 3
+                 : sig >= 25 ? 2
+                 : 1
+        return String.fromCodePoint(0xf091f + (tier - 1) * 3)
+    }
 
     // mirrored from the media card so the type scale can react to it
     property bool mediaActive: false
@@ -104,6 +118,7 @@ Scope {
         xhr.send();
     }
 
+    // timer for the weather refresh
     Timer {
         id: wxTimer
         interval: Math.max(60000, Config.weatherRefreshInterval)
@@ -113,8 +128,82 @@ Scope {
         onTriggered: root.refreshWeather()
     }
 
+    // ---------- idle dim: drop the backlight after N idle seconds, wake on input ----------
+    property int savedBrightness: -1
+    property bool dimmed: false
+    property int lastBright: -1
+    readonly property int dimTarget: Math.max(1, Math.round(savedBrightness * Config.lockscreenIdleDimTo / 100))
+
+    // smooth backlight transitions: direct sysfs/logind writes on a timer
+    property int dimDuration: 1400
+    property int wakeDuration: 500
+
+    Timer {
+        id: brightAnim
+        interval: 80
+        repeat: true
+        running: false
+        property int fromV: 0
+        property int toV: 0
+        property int durationMs: 1
+        property real progress: 0
+        onTriggered: {
+            progress = Math.min(1, progress + interval / durationMs);
+            const e = progress < 0.5 ? 2 * progress * progress
+                : 1 - Math.pow(-2 * progress + 2, 2) / 2;   // easeInOutQuad
+            const v = Math.round(fromV + (toV - fromV) * e);
+            if (v !== root.lastBright) {
+                root.lastBright = v;
+                BrightnessMonitor.setBrightness(v);
+            }
+            if (progress >= 1)
+                stop();
+        }
+    }
+
+    function startBrightAnim(fromV, toV, duration) {
+        brightAnim.fromV = fromV;
+        brightAnim.toV = toV;
+        brightAnim.durationMs = duration;
+        brightAnim.progress = 0;
+        brightAnim.restart();
+    }
+
+    function dimScreen() {
+        if (Config.lockscreenIdleDim <= 0 || root.dimmed)
+            return;
+        const v = BrightnessMonitor.brightness
+        if (v <= 0)
+            return
+        root.savedBrightness = v
+        root.lastBright = v
+        root.dimmed = true
+        startBrightAnim(v, root.dimTarget, dimDuration)
+    }
+
+    function wakeScreen() {
+        if (!root.dimmed)
+            return;
+        root.dimmed = false;
+        if (root.savedBrightness > 0)
+            startBrightAnim(root.lastBright, root.savedBrightness, wakeDuration)
+    }
+
+    function activity() {
+        idleDim.restart();
+        wakeScreen();
+    }
+
+    Timer {
+        id: idleDim
+        interval: Math.max(1, Config.lockscreenIdleDim) * 1000
+        running: sessionLock.locked && Config.lockscreenIdleDim > 0 && !root.unlocking
+        onTriggered: root.dimScreen()
+    }
+
     // ---------- shared state (all monitors) ----------
     property string buffer: ""
+    property bool reveal: false   // show the password instead of the bullets (ctrl+v)
     property bool checking: false
     property bool failed: false
     property bool unlocking: false
@@ -140,7 +229,7 @@ Scope {
             return "wrong password \uf444 " + failCount + (failCount === 1 ? " attempt" : " attempts");
         if (pamRisky)
             return "pam counts earlier failures  \u00b7  enter again to submit";
-        return "enter to unlock \uf444 esc to clear";
+        return "Enter to unlock \uf444 Esc to clear \uf444 Ctrl+V to " + (root.reveal ? "hide" : "peek");
     }
     readonly property string detectedWallpaper: {
         let p = wpFile.text().split("\n")[0].trim();
@@ -180,6 +269,7 @@ Scope {
         root.failed = true;
         root.failCount++;
         root.buffer = "";
+        root.reveal = false;
         root.confirmArmed = false;
         root.shake();
         // pam_faillock denies=3/unlock_time=900: one miss left means a slow down
@@ -399,6 +489,7 @@ Scope {
         onLockedChanged: {
             if (locked) {
                 root.buffer = "";
+                root.reveal = false;
                 root.failed = false;
                 root.checking = false;
                 root.unlocking = false;
@@ -408,8 +499,11 @@ Scope {
                 failReset.stop();
                 refreshFailTally();
                 wpFile.reload();
+                wakeScreen();
                 if (root.showBattery && !batProc.running)
                     batProc.running = true;
+            } else {
+                wakeScreen();
             }
         }
 
@@ -513,8 +607,25 @@ Scope {
 
                 Component.onCompleted: forceActiveFocus()
 
+                // any input wakes the screen: keys (above), mouse move, click, wheel
+                MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.NoButton
+                    hoverEnabled: true
+                    onPositionChanged: root.activity()
+                }
+
+                TapHandler {
+                    onTapped: root.activity()
+                }
+
+                WheelHandler {
+                    onWheel: root.activity()
+                }
+
                 Keys.onPressed: event => {
                     event.accepted = true;
+                    root.activity();
                     if (root.checking || root.unlocking)
                         return;
                     if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
@@ -529,6 +640,9 @@ Scope {
                     } else if (event.key === Qt.Key_Escape
                                || (event.key === Qt.Key_U && (event.modifiers & Qt.ControlModifier))) {
                         root.buffer = "";
+                    } else if (event.key === Qt.Key_V && (event.modifiers & Qt.ControlModifier)) {
+                        if (root.buffer.length > 0)
+                            root.reveal = !root.reveal;
                     } else if (event.text.length > 0 && !(event.modifiers & (Qt.ControlModifier | Qt.AltModifier | Qt.MetaModifier))) {
                         const ch = event.text.charCodeAt(0);
                         if (ch >= 32 && ch !== 127) {
@@ -546,6 +660,7 @@ Scope {
                 }
 
                 Image {
+                    id: wallpaperImg
                     anchors.fill: parent
                     source: root.wallpaper !== "" ? "file://" + encodeURI(root.wallpaper) : ""
                     fillMode: Image.PreserveAspectCrop
@@ -553,6 +668,22 @@ Scope {
                     cache: false
                     sourceSize.width: 1920
                     scale: 1.10          // hides the dark edge the blur leaves behind
+
+                    // parallax: wallpaper drifts opposite the cursor (max 24px each way)
+                    property real px: 0
+                    property real py: 0
+                    Behavior on px { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
+                    Behavior on py { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
+                    transform: Translate { x: -wallpaperImg.px * 15; y: -wallpaperImg.py * 15 }
+
+                    HoverHandler {
+                        onPointChanged: {
+                            if (scene.width <= 0 || scene.height <= 0)
+                                return;
+                            wallpaperImg.px = point.scenePosition.x / scene.width - 0.7;
+                            wallpaperImg.py = point.scenePosition.y / scene.height - 0.7;
+                        }
+                    }
                     opacity: status === Image.Ready ? 1 : 0
 
                     Behavior on opacity {
@@ -709,14 +840,15 @@ Scope {
                         }
 
                         RectangularShadow {
-                            visible: Config.showShadows
+                            property real t: Config.showShadows ? 1 : 0
+                            Behavior on t { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
                             anchors.fill: box
                             radius: box.radius
                             blur: 18 + 32 * scene.morph
                             spread: 1 + 2 * scene.morph
                             offset: Qt.vector2d(0, 4 + 14 * scene.morph)
                             color: Qt.rgba(0, 0, 0, 0.5)
-                            opacity: Math.min(1, scene.morph * 2.5)
+                            opacity: Math.min(1, scene.morph * 2.5) * t
                         }
 
                         Rectangle {
@@ -833,13 +965,15 @@ Scope {
                                                 visible: height > 0
 
                                                 RectangularShadow {
-                                                    visible: Config.showShadows
+                                                    property real t: Config.showShadows ? 1 : 0
+                                                    Behavior on t { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
                                                     anchors.fill: mediaCard
                                                     radius: mediaCard.radius
                                                     blur: 28
                                                     spread: 1.5
                                                     offset: Qt.vector2d(0, 8)
                                                     color: Qt.rgba(0, 0, 0, 0.60)
+                                                    opacity: t
                                                 }
 
                                                 MediaPlayer {
@@ -925,8 +1059,8 @@ Scope {
 
                                                 SequentialAnimation {
                                                     id: typePulse
-                                                    NumberAnimation { target: field; property: "scale"; to: 1.012; duration: 90; easing.type: Easing.OutQuad }
-                                                    NumberAnimation { target: field; property: "scale"; to: 1; duration: 160; easing.type: Easing.OutQuad }
+                                                    NumberAnimation { target: field; property: "scale"; to: 1.008; duration: 120; easing.type: Easing.OutCubic }
+                                                    NumberAnimation { target: field; property: "scale"; to: 1; duration: 260; easing.type: Easing.OutCubic }
                                                 }
 
                                                 Connections {
@@ -955,41 +1089,170 @@ Scope {
                                                     anchors.rightMargin: 46
                                                     clip: true
 
-                                                    Row {
-                                                        anchors.horizontalCenter: parent.horizontalCenter
-                                                        anchors.verticalCenter: parent.verticalCenter
-                                                        spacing: 6
+                                                    // dots live in fixed slots, so typing and backspacing both animate:
+                                                    // a slot pops in (little overshoot) / shrinks out, and the strip
+                                                    // glides sideways to stay centred, like hyprlock's input field
+                                                    Item {
+                                                        id: dotStrip
+                                                        readonly property int slots: 40
+                                                        readonly property real dotSize: 9
+                                                        readonly property real gap: 7
+                                                        readonly property real step: dotSize + gap
+                                                        readonly property int count: Math.min(root.buffer.length, slots)
+                                                        readonly property real stripW: Math.max(0, count * step - gap)
+
+                                                        width: stripW
+                                                        height: parent.height
+                                                        // centred while it fits, then the newest dot stays pinned to the right edge
+                                                        x: stripW <= parent.width ? (parent.width - stripW) / 2 : parent.width - stripW
+                                                        opacity: root.reveal ? 0 : 1
+                                                        visible: opacity > 0
+
+                                                        Behavior on x {
+                                                            NumberAnimation { duration: 230; easing.type: Easing.OutCubic }
+                                                        }
+                                                        Behavior on opacity {
+                                                            NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+                                                        }
 
                                                         Repeater {
-                                                            model: Math.min(root.buffer.length, 14)
+                                                            model: dotStrip.slots
 
-                                                            // minimal bullets
                                                             Rectangle {
+                                                                id: dot
                                                                 required property int index
 
-                                                                readonly property int age: Math.min(root.buffer.length, 14) - 1 - index
+                                                                readonly property int age: root.buffer.length - 1 - index
+                                                                readonly property bool present: index < root.buffer.length
+                                                                // 0 = newest dot, 1 = 11+ dots old: drives both the colour blend and the alpha
+                                                                readonly property real fade: Math.min(1, Math.max(0, age) / 11)
 
-                                                                width: 9
-                                                                height: 9
-                                                                radius: 4.5
+                                                                width: dotStrip.dotSize
+                                                                height: dotStrip.dotSize
+                                                                radius: width / 2
+                                                                x: index * dotStrip.step
+                                                                y: (dotStrip.height - height) / 2
+
+                                                                // newest dot is bright th.hi, older ones melt toward th.sub and go transparent
                                                                 color: root.failed ? th.error
-                                            : Qt.rgba(th.hi.r, th.hi.g, th.hi.b, Math.max(0.55, 1 - age * 0.07))
+                                                                    : Qt.rgba(th.hi.r + (th.sub.r - th.hi.r) * fade,
+                                                                              th.hi.g + (th.sub.g - th.hi.g) * fade,
+                                                                              th.hi.b + (th.sub.b - th.hi.b) * fade,
+                                                                              1 - 0.8 * fade)
 
-                                                                property real pop: 0
-                                                                opacity: 0.55 + 0.45 * pop
-                                                                scale: 0.78 + 0.22 * pop
+                                                                property real pop: present ? 1 : 0
+                                                                scale: pop
+                                                                opacity: Math.min(1, pop * 1.8)
 
-                                                                NumberAnimation on pop {
-                                                                    from: 0
-                                                                    to: 1
-                                                                    duration: 320
-                                                                    easing.type: Easing.OutCubic
+                                                                Behavior on pop {
+                                                                    NumberAnimation {
+                                                                        duration: dot.present ? 290 : 170
+                                                                        easing.type: dot.present ? Easing.OutBack : Easing.InCubic
+                                                                        easing.overshoot: 2.2
+                                                                    }
                                                                 }
 
+                                                                // colours glide as dots age instead of stepping on every key
+                                                                Behavior on color {
+                                                                    ColorAnimation { duration: 190; easing.type: Easing.OutCubic }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+
+                                                    // revealed password: every character rises from below into its slot (flip-clock feel),
+                                                    // and sinks back down on backspace. the font is monospaced, so slots are a fixed width
+                                                    Item {
+                                                        id: textStrip
+                                                        readonly property int slots: 64
+                                                        readonly property real charW: charMetrics.advanceWidth
+                                                        readonly property int count: Math.min(root.buffer.length, slots)
+                                                        readonly property real stripW: count * charW
+
+                                                        width: stripW
+                                                        height: parent.height
+                                                        // centred while it fits, then the newest character stays pinned to the right edge
+                                                        x: stripW <= parent.width ? (parent.width - stripW) / 2 : parent.width - stripW
+                                                        opacity: (root.reveal && root.buffer.length > 0) ? 1 : 0
+                                                        visible: opacity > 0
+
+                                                        Behavior on x {
+                                                            NumberAnimation { duration: 240; easing.type: Easing.OutCubic }
+                                                        }
+                                                        Behavior on opacity {
+                                                            NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+                                                        }
+
+                                                        TextMetrics {
+                                                            id: charMetrics
+                                                            font.family: root.textFont
+                                                            font.pixelSize: 16
+                                                            text: "M"
+                                                        }
+
+                                                        Repeater {
+                                                            model: textStrip.slots
+
+                                                            T {
+                                                                id: glyph
+                                                                required property int index
+
+                                                                readonly property string cur: root.buffer.charAt(index)
+                                                                readonly property bool present: cur !== ""
+                                                                // keeps the last character alive while the slot sinks away
+                                                                property string shown: cur
+                                                                onCurChanged: if (cur !== "") shown = cur
+
+                                                                property real rise: present ? 1 : 0
+                                                                text: shown
+                                                                color: root.failed ? th.error : th.hi
+                                                                x: index * textStrip.charW
+                                                                // starts 6px below its spot and fades in on the way up
+                                                                y: (textStrip.height - height) / 2 + (1 - rise) * 6
+                                                                opacity: rise
+
+                                                                Behavior on rise {
+                                                                    NumberAnimation {
+                                                                        duration: glyph.present ? 80 : 100
+                                                                        easing.type: glyph.present ? Easing.OutCubic : Easing.InCubic
+                                                                    }
+                                                                }
                                                                 Behavior on color {
                                                                     ColorAnimation { duration: 180 }
                                                                 }
                                                             }
+                                                        }
+                                                    }
+                                                }
+
+                                                // eye toggle, same glyphs as the wifi password prompt
+                                                I {
+                                                    id: eyeBtn
+                                                    readonly property bool live: root.buffer.length > 0 && !root.checking && !root.unlocking
+                                                    anchors.right: goBtn.left
+                                                    anchors.rightMargin: 8
+                                                    anchors.verticalCenter: parent.verticalCenter
+                                                    text: root.reveal ? "\uf070" : "\uf06e" // eye-slash / eye
+                                                    color: eyeArea.containsMouse ? th.hi : th.sub
+                                                    font.pixelSize: 16
+                                                    opacity: live ? 1 : 0
+                                                    visible: opacity > 0
+
+                                                    Behavior on opacity {
+                                                        NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+                                                    }
+                                                    Behavior on color { ColorAnimation { duration: 120 } }
+
+                                                    MouseArea {
+                                                        id: eyeArea
+                                                        anchors.fill: parent
+                                                        anchors.margins: -7
+                                                        enabled: eyeBtn.live
+                                                        hoverEnabled: true
+                                                        cursorShape: Qt.PointingHandCursor
+                                                        onClicked: {
+                                                            root.reveal = !root.reveal;
+                                                            scene.forceActiveFocus();
                                                         }
                                                     }
                                                 }
@@ -1090,6 +1353,13 @@ Scope {
 
                                             I { text: root.wGlyph; color: root.wGlyphColor; font.pixelSize: 24; height: 20; verticalAlignment: Text.AlignVCenter }
                                             T { text: Math.round(root.wTemp) + root.wUnit; height: 20; verticalAlignment: Text.AlignVCenter }
+                                        }
+
+                                        Pill {
+                                            visible: root.wifiOk
+
+                                            I { text: root.wifiGlyph(WifiController.currentSignal); color: Theme.netFg; font.pixelSize: 23; height: 20; verticalAlignment: Text.AlignVCenter }
+                                            T { text: WifiController.currentSsid; height: 20; verticalAlignment: Text.AlignVCenter; elide: Text.ElideRight; Layout.maximumWidth: 220 }
                                         }
 
                                         Pill {

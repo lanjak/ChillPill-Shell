@@ -20,6 +20,7 @@ Item {
     property int previewSlideDir: 1  // 1 = down/next, -1 = up/prev
     property string previewText: ""  // full decoded content for text preview
     property string previewTargetId: ""  // entry id the in-flight decode is for
+    property bool pendingG: false
     property bool previewReady: false  // true when previewText matches previewTargetId
     // only the head of a long entry is matched: rows elide it anyway and a big
     // history has to stay fast on every keystroke
@@ -27,6 +28,7 @@ Item {
 
     signal closeRequested()
     signal previewToggled(bool active)
+    signal imageDroppedAsWallpaper(string path)
 
     visible: shown
     opacity: shown ? 1 : 0
@@ -34,6 +36,8 @@ Item {
     scale: shown ? 1 : 0.96
     Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
     transformOrigin: Item.Center
+
+    property bool wlClipboardMissing: false
 
     ListModel { id: listModel }
 
@@ -191,6 +195,7 @@ Item {
 
     function copySelected() {
         if (listModel.count === 0) return
+        if (root.wlClipboardMissing) return
         let entry = listModel.get(selectedIndex)
         console.log("cliphist entry id:", entry.id)
         copyProc.command = ["sh", "-c", "cliphist decode " + entry.id + " | wl-copy"]
@@ -266,6 +271,13 @@ Item {
         root.previewToggled(fullPreview)
     }
 
+    // Shift+Up/Down in preview scrolls the text; images can't scroll so fall back to navigation
+    function scrollPreview(dir) {
+        let p = previewLoad.item
+        if (p && p.scrollLines(dir)) return
+        root.moveSelection(dir)
+    }
+
     function findAdjacentTypeIndex(direction, wantImage) {
         if (listModel.count === 0) return -1
         let idx = root.selectedIndex
@@ -275,6 +287,32 @@ Item {
             if (wantImage ? !!e.imagePath : !e.imagePath) return idx
         }
         return -1
+    }
+
+    // gg / G: jump to the first / last entry, staying on the preview's type
+    function findEdgeTypeIndex(last, wantImage) {
+        if (listModel.count === 0) return -1
+        let idx = last ? listModel.count - 1 : 0
+        let step = last ? -1 : 1
+        for (let i = 0; i < listModel.count; i++, idx += step) {
+            let e = listModel.get(idx)
+            if (wantImage ? !!e.imagePath : !e.imagePath) return idx
+        }
+        return -1
+    }
+
+    function jumpTo(dir) {
+        if (listModel.count === 0) return
+        if (root.fullPreview && Config.separatePreviewTabTypes) {
+            let target = root.findEdgeTypeIndex(dir === 1, root.currentIsImage())
+            if (target === -1) return
+            root.previewSlideDir = dir
+            root.selectedIndex = target
+        } else {
+            root.previewSlideDir = dir
+            root.selectedIndex = dir === 1 ? listModel.count - 1 : 0
+        }
+        listView.positionViewAtIndex(root.selectedIndex, ListView.Contain)
     }
 
     function moveSelection(dir) {
@@ -319,13 +357,22 @@ Item {
     // Shared keyboard shortcuts so they keep working whether the search box
     // or the (focused) preview text holds the active focus.
     function onShortcutPressed(event) {
+        // pending gg expires if another key comes first (vim-style)
+        if (root.pendingG && event.key !== Qt.Key_G) {
+            root.pendingG = false
+            gSeqTimer.stop()
+        }
         if (event.key === Qt.Key_Down) {
-            if (event.modifiers & Qt.ShiftModifier && !root.fullPreview) root.extendMark(1)
-            else root.moveSelection(1)
+            if (event.modifiers & Qt.ShiftModifier) {
+                if (root.fullPreview) root.scrollPreview(1)
+                else root.extendMark(1)
+            } else root.moveSelection(1)
             event.accepted = true
         } else if (event.key === Qt.Key_Up) {
-            if (event.modifiers & Qt.ShiftModifier && !root.fullPreview) root.extendMark(-1)
-            else root.moveSelection(-1)
+            if (event.modifiers & Qt.ShiftModifier) {
+                if (root.fullPreview) root.scrollPreview(-1)
+                else root.extendMark(-1)
+            } else root.moveSelection(-1)
             event.accepted = true
         } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
             root.copySelected()
@@ -346,7 +393,28 @@ Item {
             console.log("Tab key clicked for clipboard full preview")
             root.fullPreviewSelected()
             event.accepted = true
+        } else if (event.key === Qt.Key_G && root.searchQuery.length === 0) {
+            // gg jumps to top, G to bottom; with search text, g/G just types
+            if (event.modifiers & Qt.ShiftModifier) {
+                root.jumpTo(1)
+                root.pendingG = false
+                gSeqTimer.stop()
+            } else if (root.pendingG) {
+                root.jumpTo(-1)
+                root.pendingG = false
+                gSeqTimer.stop()
+            } else {
+                root.pendingG = true
+                gSeqTimer.restart()
+            }
+            event.accepted = true
         }
+    }
+
+    Timer {
+        id: gSeqTimer
+        interval: 600
+        onTriggered: root.pendingG = false
     }
 
     Timer {
@@ -488,6 +556,14 @@ Item {
         running: false
     }
 
+    // detect whether wl-clipboard (wl-copy) is available; copy/paste breaks without it
+    Process {
+        id: wlClipboardCheck
+        command: ["sh", "-c", "command -v wl-copy >/dev/null 2>&1"]
+        running: true
+        onExited: (code) => { root.wlClipboardMissing = (code !== 0) }
+    }
+
     Process {
         id: decodeProc
         running: false
@@ -539,6 +615,17 @@ Item {
             Layout.alignment: Qt.AlignRight
             Layout.rightMargin: 6
           }
+        }
+
+        // warning: wl-clipboard not available -> copy/paste broken
+        Text {
+            visible: root.wlClipboardMissing && !fullPreview
+            anchors.horizontalCenter: parent.horizontalCenter
+            horizontalAlignment: Text.AlignHCenter
+            wrapMode: Text.WordWrap
+            color: Theme.warning
+            text: "wl-clipboard not found on $PATH\ninstall wl-clipboard to copy/paste cliphist items"
+            font { family: Theme.fontFamily; pixelSize: 11 }
         }
 
         // search box
@@ -593,6 +680,7 @@ Item {
             visible: fullPreview
 
             Loader {
+                id: previewLoad
                 anchors.fill: parent
                 active: fullPreview
                 asynchronous: true
@@ -707,17 +795,31 @@ Item {
                                     plural(textInfo.words, "word"), plural(textInfo.lines, "line")].join(" • ")
                         }
 
-                        readonly property string lineNumbers: {
-                            let n = textInfo.lines
-                            let out = ""
-                            for (let i = 1; i <= n; i++) {
-                                if (i > 1) out += "\n"
-                                out += i
+                        readonly property int lineNumWidth: Math.max(1, String(textInfo.lines).length) * 7 + 12
+                        readonly property bool textReady: root.previewReady && root.previewTargetId === currentEntryId
+                        readonly property string lineGutter: {
+                            // touch the inputs so the binding re-evaluates when they change
+                            let dep = [root.previewText, textReady, textPreview.lineCount, textPreview.width]
+                            return buildGutter()
+                        }
+                        // number each VISUAL row: a wrapped logical line shows its number on the
+                        // first row and its continuations stay blank, so the gutter stays aligned
+                        function buildGutter() {
+                            if (!textReady) return ""
+                            let body = root.previewText.endsWith("\n") ? root.previewText.slice(0, -1) : root.previewText
+                            if (body === "") return ""
+                            let lines = body.split("\n")
+                            let out = "", rowNext = 0, pos = 0
+                            for (let i = 0; i < lines.length; i++) {
+                                let r = textPreview.positionToRectangle(pos)
+                                let s = r.height > 0 ? Math.round(r.y / r.height) : 0
+                                if (rowNext === 0) out = String(i + 1)
+                                else out += "\n".repeat(Math.max(1, s - rowNext + 1)) + String(i + 1)
+                                rowNext = s + 1
+                                pos += lines[i].length + 1
                             }
                             return out
                         }
-                        readonly property int lineNumWidth: Math.max(1, String(textInfo.lines).length) * 7 + 12
-                        readonly property bool textReady: root.previewReady && root.previewTargetId === currentEntryId
                         readonly property bool currentDeleting: root.isDeleting(currentEntryId)
                         readonly property bool currentCollapsing: root.isCollapsing(currentEntryId)
                         // brief "Copied" toast shown when text is copied from the preview
@@ -726,6 +828,18 @@ Item {
                         function flashCopied() {
                             copiedFlash = true
                             copiedFlashTimer.restart()
+                        }
+
+                        // Shift+Up/Down: step the text preview by a few lines, false when it can't scroll (image)
+                        function scrollLines(dir) {
+                            if (!textFlick.visible) return false
+                            let max = Math.max(0, textFlick.contentHeight - textFlick.height)
+                            let step = textPreview.font.pixelSize * 5 + 4
+                            let target = Math.max(0, Math.min(textFlick.contentY + dir * step, max))
+                            if (target === textFlick.contentY) return true
+                            textScrollAnim.to = target
+                            textScrollAnim.restart()
+                            return true
                         }
 
                         Component.onCompleted: {
@@ -917,8 +1031,9 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                                 horizontalAlignment: Text.AlignHCenter
                                 text: (root.selectedIndex + 1) + " / " + listModel.count
+                                      + (currentIsImage ? " • drag to drop" : root.previewText.split("\n").length >= 8 ? " • Shift + Up/Down to scroll" : "")
                                 color: Theme.fg3
-                                font { family: Theme.fontFamily; pixelSize: 9; weight: 300 }
+                                font { family: Theme.fontFamily; pixelSize: 10; weight: 300 }
                             }
                         }
 
@@ -960,18 +1075,31 @@ Item {
                                 anchors.rightMargin: 12
                                 clip: true
                                 boundsBehavior: Flickable.StopAtBounds
-                                flickableDirection: Flickable.HorizontalAndVerticalFlick
-                                contentWidth: codeArea.implicitWidth
+                                flickableDirection: Flickable.VerticalFlick
+                                contentWidth: width
                                 contentHeight: codeArea.implicitHeight
 
-                                Row {
+                                // smooth Shift+Up/Down scrolling, stops when the user grabs it manually
+                                NumberAnimation {
+                                    id: textScrollAnim
+                                    target: textFlick
+                                    property: "contentY"
+                                    duration: 170
+                                    easing.type: Easing.OutCubic
+                                }
+                                onMovementStarted: textScrollAnim.stop()
+
+                                Item {
                                     id: codeArea
-                                    spacing: 8
+                                    width: textFlick.width
+                                    implicitHeight: Math.max(lineNumText.height, textPreview.height)
+                                    height: implicitHeight
 
                                     Text {
                                         id: lineNumText
                                         width: lineNumWidth
-                                        text: lineNumbers
+                                        text: lineGutter
+                                        anchors.left: parent.left
                                         color: Theme.fg6
                                         font { family: Theme.fontFamily; pixelSize: 12 }
                                         horizontalAlignment: Text.AlignRight
@@ -986,10 +1114,13 @@ Item {
                                     // can be mouse-selected (and copied) in the full preview.
                                     TextEdit {
                                         id: textPreview
+                                        anchors.left: lineNumText.right
+                                        anchors.leftMargin: 8
+                                        anchors.right: parent.right
                                         text: root.previewText
                                         color: Theme.fg
                                         font { family: Theme.fontFamily; pixelSize: 12 }
-                                        wrapMode: TextEdit.NoWrap
+                                        wrapMode: TextEdit.WrapAtWordBoundaryOrAnywhere
                                         textFormat: TextEdit.PlainText
                                         readOnly: true
                                         selectByMouse: true
@@ -1020,7 +1151,6 @@ Item {
                                         }
                                         // TextEdit doesn't auto-size like Text does,
                                         // so track its content size explicitly.
-                                        width: implicitWidth
                                         height: implicitHeight
 
                                         opacity: currentCollapsing ? 0 : (textReady ? 1 : 0)
@@ -1030,6 +1160,58 @@ Item {
                                     }
                                 }
                             }
+                        }
+
+                        // image drag, following the manual MouseArea drag pattern:
+                        // press lifts the image once it moves, a ghost follows the cursor
+                        // (rendered by the shell above the pill), release outside the pill
+                        // drops it as wallpaper, inside cancels back to the preview
+                        property point dragPressPos: Qt.point(0, 0)
+                        property bool imageDragging: false
+
+                        function finishImageDrag(releaseGlobal) {
+                            if (!imageDragging) return
+                            imageDragging = false
+                            shellRoot.clipDragLive = false
+                            let outside = false
+                            if (releaseGlobal) {
+                                let p = root.mapFromItem(null, releaseGlobal.x, releaseGlobal.y)
+                                outside = p.x < 0 || p.y < 0 || p.x > root.width || p.y > root.height
+                            }
+                            if (shellRoot.clipDragNative) return
+                            shellRoot.clipDragImage = null
+                            if (outside && entry) root.imageDroppedAsWallpaper(entry.imagePath)
+                        }
+
+                        MouseArea {
+                            id: imageDragArea
+                            anchors.fill: parent
+                            enabled: currentIsImage && entry
+                            acceptedButtons: Qt.LeftButton
+                            cursorShape: currentIsImage ? (pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor) : Qt.IBeamCursor
+                            onPressed: (mouse) => {
+                                previewRoot.dragPressPos = Qt.point(mouse.x, mouse.y)
+                                previewRoot.imageDragging = false
+                            }
+                            onPositionChanged: (mouse) => {
+                                let dx = mouse.x - previewRoot.dragPressPos.x
+                                let dy = mouse.y - previewRoot.dragPressPos.y
+                                if (!previewRoot.imageDragging && dx * dx + dy * dy > 64)
+                                    previewRoot.imageDragging = true
+                                if (previewRoot.imageDragging) {
+                                    shellRoot.clipDragLive = true
+                                    let g = imageDragArea.mapToItem(null, mouse.x, mouse.y)
+                                    shellRoot.clipDragImage = { path: entry.imagePath, x: g.x, y: g.y }
+                                    // leaving the pill hands the drag to the system, so it
+                                    // can be dropped into browsers / file managers
+                                    let p = root.mapFromItem(null, g.x, g.y)
+                                    if (p.x < -16 || p.y < -16 || p.x > root.width + 16 || p.y > root.height + 16)
+                                        shellRoot.beginNativeImageDrag()
+                                }
+                            }
+                            onReleased: (mouse) => previewRoot.finishImageDrag(
+                                previewRoot.imageDragging ? imageDragArea.mapToItem(null, mouse.x, mouse.y) : null)
+                            onCanceled: previewRoot.finishImageDrag(null)
                         }
 
                         onCurrentEntryIdChanged: {

@@ -49,6 +49,7 @@ constexpr auto kIwdAgentManagerInterface = "net.connman.iwd.AgentManager";
 constexpr auto kIwdDeviceInterface = "net.connman.iwd.Device";
 constexpr auto kIwdStationInterface = "net.connman.iwd.Station";
 constexpr auto kIwdNetworkInterface = "net.connman.iwd.Network";
+constexpr auto kIwdKnownNetworkInterface = "net.connman.iwd.KnownNetwork";
 constexpr auto kIwdAgentObjectPath = "/com/tideisland/PillBackend/IwdAgent";
 constexpr auto kObjectManagerInterface = "org.freedesktop.DBus.ObjectManager";
 constexpr auto kIwdAgentCanceledError = "net.connman.iwd.Agent.Error.Canceled";
@@ -370,6 +371,100 @@ QString WifiController::currentSsid() const {
     return m_currentSsid;
 }
 
+int WifiController::currentSignal() const {
+    return m_currentSignal;
+}
+
+int WifiController::currentFrequency() const {
+    return m_currentFrequency;
+}
+
+QString WifiController::currentSecurity() const {
+    return m_currentSecurity;
+}
+
+void WifiController::updateCurrentNetworkInfo() {
+    int signal = -1;
+    int frequency = -1;
+    QString security;
+
+    if (m_enabled && isValidPath(m_wifiDevicePath) && !m_currentSsid.isEmpty()) {
+        if (m_backendName == QLatin1String("iwd")) {
+            // frequency is not exposed by iwd's normal interfaces, the band chip stays hidden
+            const auto network = m_networks.networkForSsid(m_currentSsid);
+            if (network.has_value()) {
+                signal = network->signal;
+                if (network->type == QLatin1String("psk") || network->type == QLatin1String("8021x"))
+                    security = QStringLiteral("WPA2");
+                else if (network->type == QLatin1String("wep"))
+                    security = QStringLiteral("WEP");
+                else
+                    security = QStringLiteral("Open");
+            }
+        } else {
+            const QString accessPointPath = objectPathFromVariant(getProperty(
+                kNetworkManagerService,
+                m_wifiDevicePath,
+                kNetworkManagerWirelessInterface,
+                QStringLiteral("ActiveAccessPoint")
+            ));
+
+            if (isValidPath(accessPointPath)) {
+                signal = getProperty(
+                    kNetworkManagerService,
+                    accessPointPath,
+                    kNetworkManagerAccessPointInterface,
+                    QStringLiteral("Strength")
+                ).toInt();
+                frequency = getProperty(
+                    kNetworkManagerService,
+                    accessPointPath,
+                    kNetworkManagerAccessPointInterface,
+                    QStringLiteral("Frequency")
+                ).toInt();
+
+                const uint flags = getProperty(
+                    kNetworkManagerService,
+                    accessPointPath,
+                    kNetworkManagerAccessPointInterface,
+                    QStringLiteral("Flags")
+                ).toUInt();
+                const uint wpaFlags = getProperty(
+                    kNetworkManagerService,
+                    accessPointPath,
+                    kNetworkManagerAccessPointInterface,
+                    QStringLiteral("WpaFlags")
+                ).toUInt();
+                const uint rsnFlags = getProperty(
+                    kNetworkManagerService,
+                    accessPointPath,
+                    kNetworkManagerAccessPointInterface,
+                    QStringLiteral("RsnFlags")
+                ).toUInt();
+
+                constexpr uint kSecKeyMgmtSae = 0x400;
+                if (!(flags & kAccessPointPrivacyFlag) && wpaFlags == 0 && rsnFlags == 0)
+                    security = QStringLiteral("Open");
+                else if ((rsnFlags & kSecKeyMgmtSae) != 0)
+                    security = QStringLiteral("WPA3");
+                else if (rsnFlags != 0)
+                    security = QStringLiteral("WPA2");
+                else if (wpaFlags != 0)
+                    security = QStringLiteral("WPA");
+                else
+                    security = QStringLiteral("WEP");
+            }
+        }
+    }
+
+    if (signal != m_currentSignal || frequency != m_currentFrequency || security != m_currentSecurity) {
+        m_currentSignal = signal;
+        m_currentFrequency = frequency;
+        m_currentSecurity = security;
+        emit currentNetworkInfoChanged();
+    }
+}
+
 QString WifiController::statusText() const {
     return m_statusText;
 }
@@ -495,6 +590,104 @@ void WifiController::disconnectCurrent() {
 
     setInfoMessage(QStringLiteral("Disconnected from Wi-Fi."));
     refreshStateInternal();
+}
+
+// drops the saved profile for a network: NetworkManager DeleteConnection, iwd ForgetNetwork
+void WifiController::forgetNetwork(const QString &ssid) {
+    clearMessages();
+
+    const QString trimmedSsid = ssid.trimmed();
+    if (trimmedSsid.isEmpty() || !m_supported)
+        return;
+
+    if (!m_available || !isValidPath(m_wifiDevicePath)) {
+        setErrorMessage(QStringLiteral("No Wi-Fi device is available."));
+        return;
+    }
+
+    if (m_backendName == QLatin1String("iwd")) {
+        QString knownNetworkPath;
+        const auto network = m_networks.networkForSsid(trimmedSsid);
+        if (network.has_value() && !network->objectPath.isEmpty()) {
+            knownNetworkPath = objectPathFromVariant(getProperty(
+                kIwdService,
+                network->objectPath,
+                QString::fromLatin1(kIwdNetworkInterface),
+                QStringLiteral("KnownNetwork")
+            ));
+        }
+
+        // the saved network may be out of scan range, so fall back to the object tree
+        if (!isValidPath(knownNetworkPath)) {
+            const QDBusMessage objectsReply = callMethod(
+                kIwdService,
+                kRootPath,
+                kObjectManagerInterface,
+                QStringLiteral("GetManagedObjects")
+            );
+            const IwdManagedObjectMap managedObjects = objectsReply.type() == QDBusMessage::ErrorMessage
+                ? IwdManagedObjectMap {}
+                : managedObjectsFromVariant(objectsReply.arguments().value(0));
+
+            for (auto it = managedObjects.constBegin(); it != managedObjects.constEnd(); ++it) {
+                const QVariantMap properties = it.value().value(QString::fromLatin1(kIwdKnownNetworkInterface));
+                if (properties.value(QStringLiteral("Name")).toString().trimmed() == trimmedSsid) {
+                    knownNetworkPath = it.key().path();
+                    break;
+                }
+            }
+        }
+
+        if (!isValidPath(knownNetworkPath)) {
+            setErrorMessage(QStringLiteral("This network is not saved, nothing to forget."));
+            return;
+        }
+
+        const QDBusMessage reply = callMethod(
+            kIwdService,
+            knownNetworkPath,
+            QString::fromLatin1(kIwdKnownNetworkInterface),
+            QStringLiteral("ForgetNetwork")
+        );
+
+        if (reply.type() == QDBusMessage::ErrorMessage) {
+            setErrorMessage(errorTextForReply(reply, QStringLiteral("Unable to forget the network.")));
+            return;
+        }
+
+        setInfoMessage(QStringLiteral("Forgot %1.").arg(trimmedSsid));
+        refreshStateInternal();
+        return;
+    }
+
+    const QString connectionPath = m_savedConnectionsBySsid.value(trimmedSsid);
+    if (connectionPath.isEmpty()) {
+        setErrorMessage(QStringLiteral("This network is not saved, nothing to forget."));
+        return;
+    }
+
+    if (trimmedSsid == m_currentSsid)
+        disconnectCurrent();
+
+    const QDBusMessage reply = callMethod(
+        kNetworkManagerService,
+        connectionPath,
+        kNetworkManagerSettingsConnectionInterface,
+        QStringLiteral("Delete")
+    );
+
+    if (reply.type() == QDBusMessage::ErrorMessage) {
+        setErrorMessage(errorTextForReply(reply, QStringLiteral("Unable to forget the network.")));
+        return;
+    }
+
+    m_savedConnectionsBySsid.remove(trimmedSsid);
+    m_savedConnectionsDirty = true;
+    setInfoMessage(QStringLiteral("Forgot %1.").arg(trimmedSsid));
+
+    // forget a background profile -> the list has to lose its "saved" badge now
+    if (trimmedSsid != m_currentSsid)
+        refreshNetworksInternal(false, true);
 }
 
 void WifiController::connectToNetwork(const QString &ssid, const QString &password) {
@@ -1032,6 +1225,7 @@ void WifiController::refreshStateInternal() {
         setCurrentSsid({});
         m_networks.clear();
         updateStatusText();
+        updateCurrentNetworkInfo();
         return;
     }
 
@@ -1042,6 +1236,7 @@ void WifiController::refreshStateInternal() {
         setCurrentSsid({});
         m_networks.clear();
         updateStatusText();
+        updateCurrentNetworkInfo();
         return;
     }
 
@@ -1079,6 +1274,7 @@ void WifiController::refreshNetworksInternal(bool rescan, bool triggeredBySignal
         if (!triggeredBySignal)
             setScanningState(false);
         updateStatusText();
+        updateCurrentNetworkInfo();
         return;
     }
 
@@ -1209,6 +1405,7 @@ void WifiController::refreshNetworksInternal(bool rescan, bool triggeredBySignal
         }
 
         updateStatusText();
+        updateCurrentNetworkInfo();
         return;
     }
 
@@ -1317,6 +1514,7 @@ void WifiController::refreshNetworksInternal(bool rescan, bool triggeredBySignal
     if (!triggeredBySignal && !rescan)
         setScanningState(false);
     updateStatusText();
+    updateCurrentNetworkInfo();
 }
 
 void WifiController::reloadSavedConnections() {
